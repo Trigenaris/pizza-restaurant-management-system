@@ -1,7 +1,7 @@
 <!-- Main Headline Here... -->
 <h1 align='center'> 🍕 Pizza Restaurant Management System (In Progress) </h1>
 
-![Crazy Pizza Restaurant](https://github.com/Trigenaris/pizza-restaurant-management-system/blob/main/crazy_logo.png)
+<img align="center" src="https://github.com/Trigenaris/pizza-restaurant-management-system/blob/main/crazy_logo.png" />
 
 In this project; we focus on a **Restaurant Management**, specifically a made-up restaurant called *Crazy Pizza Restaurant*. The restaurant management system has a menu stored in a database that contains *CRUD* operations and has a system in which any item can be ordered. Also, orders are part of the database structure to analyze the current situation of the restaurant. The main features of the system are as shown with the help of the referred modules and libraries:
 
