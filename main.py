@@ -126,7 +126,7 @@ class GUI:
         show_menu_button.pack(pady=PADY)
         add_product_button = ttk.Button(left_frame1, text="New Product", command=self.add_product)
         add_product_button.pack(pady=PADY)
-        remove_product_button = ttk.Button(left_frame1, text="Remove Product", command=lambda: print("product removed"))
+        remove_product_button = ttk.Button(left_frame1, text="Remove Product", command=lambda: self.remove_product(self.tree_menu))
         remove_product_button.pack(pady=PADY)
         update_product_button = ttk.Button(left_frame1, text="Update Product", command=lambda: self.update_product(self.tree_menu))
         update_product_button.pack(pady=PADY)
@@ -168,6 +168,60 @@ class GUI:
 
             for drink in drinks:
                 self.tree_menu.insert("", "end", values=(drink[0], "Drink", drink[2], drink[3], drink[4]))
+
+    @handle_errors
+    def add_product(self):
+        add_product_window = tk.Toplevel(self.window)
+        add_product_window.title("New Product")
+        add_product_window.geometry("500x400")
+        add_product_window.resizable(False, False)
+
+        product_type_label = ttk.Label(add_product_window, text="Product Type: ")
+        product_type_label.grid(row=0, column=0, sticky="nsew", padx=PADX, pady=PADY)
+        product_tuple = ("Pizza", "Snack", "Drink")
+        product_string = tk.StringVar(value=product_tuple[0])
+        combobox_product = ttk.Combobox(add_product_window, textvariable=product_string)
+        combobox_product['values'] = product_tuple
+        combobox_product.grid(row=0, column=1, sticky="nsew", padx=PADX, pady=PADY)
+
+        product_name_label = ttk.Label(add_product_window, text="Product Name: ")
+        product_name_label.grid(row=1, column=0, sticky="nsew", padx=PADX, pady=PADY)
+        product_name_entry = ttk.Entry(add_product_window, width=30)
+        product_name_entry.grid(row=1, column=1, sticky="nsew", padx=PADX, pady=PADY)
+
+        product_price_label = ttk.Label(add_product_window, text="Product Price: ")
+        product_price_label.grid(row=2, column=0, sticky="nsew", padx=PADX, pady=PADY)
+        product_price_entry = ttk.Entry(add_product_window, width=30)
+        product_price_entry.grid(row=2, column=1, sticky="nsew", padx=PADX, pady=PADY)
+
+        product_ingredients_label = ttk.Label(add_product_window, text="Ingredients: ")
+        product_ingredients_label.grid(row=3, column=0, sticky="nsew", padx=PADX, pady=PADY)
+        product_ingredients_entry = tk.Text(add_product_window, width=30, height=15)
+        product_ingredients_entry.grid(row=3, column=1, sticky="nsew", padx=PADX, pady=PADY)
+
+        @handle_errors
+        def adding_product():
+            product_type = product_string.get()
+            product_name = product_name_entry.get()
+            product_price = float(product_price_entry.get())
+            product_ingredients = product_ingredients_entry.get("1.0", tk.END).strip()
+
+            if product_type and product_name and product_price:
+
+                if product_type == "Pizza":
+                    self.pizzas.add_product(product_name, product_price, product_ingredients)
+                elif product_type == "Snack":
+                    self.snacks.add_product(product_name, product_price, product_ingredients)
+                elif product_type == "Drink":
+                    self.drinks.add_product(product_name, product_price, product_ingredients)
+                else:
+                    messagebox.showerror(title="Error!", message="Oops! \nInvalid product type.")
+
+            else:
+                messagebox.showwarning(title="Warning!", message="Please fill the Product Name and the Product Price.")
+
+        adding_product_button = ttk.Button(add_product_window, text="Add Product", command=adding_product)
+        adding_product_button.grid(row=4, column=0, columnspan=2, pady=PADY)
 
     @handle_errors
     def update_product(self, tree_menu):
@@ -236,58 +290,53 @@ class GUI:
         updating_product_button.grid(row=4, column=0, columnspan=2, pady=PADY)
 
     @handle_errors
-    def add_product(self):
-        add_product_window = tk.Toplevel(self.window)
-        add_product_window.title("New Product")
-        add_product_window.geometry("500x400")
-        add_product_window.resizable(False, False)
+    def remove_product(self, tree_menu):
+        selected_item = tree_menu.selection()
+        if not selected_item:
+            messagebox.showwarning(title="Warning!", message="You haven't selected any product from the menu.")
+            return
 
-        product_type_label = ttk.Label(add_product_window, text="Product Type: ")
-        product_type_label.grid(row=0, column=0, sticky="nsew", padx=PADX, pady=PADY)
-        product_tuple = ("Pizza", "Snack", "Drink")
-        product_string = tk.StringVar(value=product_tuple[0])
-        combobox_product = ttk.Combobox(add_product_window, textvariable=product_string)
-        combobox_product['values'] = product_tuple
-        combobox_product.grid(row=0, column=1, sticky="nsew", padx=PADX, pady=PADY)
+        remove_product_window = tk.Toplevel(self.window)
+        remove_product_window.title("Remove Product")
+        remove_product_window.geometry("350x200")
+        remove_product_window.resizable(False, False)
 
-        product_name_label = ttk.Label(add_product_window, text="Product Name: ")
-        product_name_label.grid(row=1, column=0, sticky="nsew", padx=PADX, pady=PADY)
-        product_name_entry = ttk.Entry(add_product_window, width=30)
-        product_name_entry.grid(row=1, column=1, sticky="nsew", padx=PADX, pady=PADY)
+        item_values = tree_menu.item(selected_item)["values"]
+        item_id = item_values[0]
+        item_type = item_values[1]
+        name = item_values[2]
+        price = item_values[3]
 
-        product_price_label = ttk.Label(add_product_window, text="Product Price: ")
-        product_price_label.grid(row=2, column=0, sticky="nsew", padx=PADX, pady=PADY)
-        product_price_entry = ttk.Entry(add_product_window, width=30)
-        product_price_entry.grid(row=2, column=1, sticky="nsew", padx=PADX, pady=PADY)
-
-        product_ingredients_label = ttk.Label(add_product_window, text="Ingredients: ")
-        product_ingredients_label.grid(row=3, column=0, sticky="nsew", padx=PADX, pady=PADY)
-        product_ingredients_entry = tk.Text(add_product_window, width=30, height=15)
-        product_ingredients_entry.grid(row=3, column=1, sticky="nsew", padx=PADX, pady=PADY)
+        remove_product_label = ttk.Label(remove_product_window, text=f'''
+        The product you selected to remove is:
+                Product ID: {item_id}
+                Product Type: {item_type}
+                Product Name: {name}
+                Product Price: {price}
+        ''')
+        remove_product_label.grid(row=0, column=0, columnspan=2, sticky="nsew", padx=PADX, pady=PADY)
 
         @handle_errors
-        def adding_product():
-            product_type = product_string.get()
-            product_name = product_name_entry.get()
-            product_price = float(product_price_entry.get())
-            product_ingredients = product_ingredients_entry.get("1.0", tk.END).strip()
+        def removing_product():
+            if messagebox.askyesno(title="Remove Product", message="Are you sure to remove this product?"):
+                if item_type == "Pizza":
+                    self.pizzas.remove_product(item_id)
+                    messagebox.showinfo(title="Success!", message="Product removed successfully!")
+                    remove_product_window.destroy()
+                elif item_type == "Snack":
+                    self.snacks.remove_product(item_id)
+                    messagebox.showinfo(title="Success!", message="Product removed successfully!")
+                    remove_product_window.destroy()
+                elif item_type == "Drink":
+                    self.drinks.remove_product(item_id)
+                    messagebox.showinfo(title="Success!", message="Product removed successfully!")
+                    remove_product_window.destroy()
 
-            if product_type and product_name and product_price:
+        remove_product_button = ttk.Button(remove_product_window, text="Remove Product", command=removing_product)
+        remove_product_button.grid(row=1, column=0, padx=PADX, pady=PADY*2)
 
-                if product_type == "Pizza":
-                    self.pizzas.add_product(product_name, product_price, product_ingredients)
-                elif product_type == "Snack":
-                    self.snacks.add_product(product_name, product_price, product_ingredients)
-                elif product_type == "Drink":
-                    self.drinks.add_product(product_name, product_price, product_ingredients)
-                else:
-                    messagebox.showerror(title="Error!", message="Oops! \nInvalid product type.")
-
-            else:
-                messagebox.showwarning(title="Warning!", message="Please fill the Product Name and the Product Price.")
-
-        adding_product_button = ttk.Button(add_product_window, text="Add Product", command=adding_product)
-        adding_product_button.grid(row=4, column=0, columnspan=2, pady=PADY)
+        cancel_button = ttk.Button(remove_product_window, text="Cancel", command=remove_product_window.destroy)
+        cancel_button.grid(row=1, column=1, padx=PADX, pady=PADY*2)
 
     def show_menu(self):
         self.pizzas.list_products()
@@ -398,6 +447,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-# TODO different frames for each role (login, manager, waiter, chef)
 
-# TODO Preparing layouts
