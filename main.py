@@ -109,7 +109,7 @@ class GUI:
         tab2 = ttk.Frame(notebook)
         tab3 = ttk.Frame(notebook)
         notebook.add(tab1, text="Menu Management")
-        notebook.add(tab2, text="Restaurant Analysis")
+        notebook.add(tab2, text="Orders")
         notebook.add(tab3, text="<Placeholder>")
         notebook.pack(fill=tk.BOTH)
 
@@ -338,9 +338,6 @@ class GUI:
         cancel_button = ttk.Button(remove_product_window, text="Cancel", command=remove_product_window.destroy)
         cancel_button.grid(row=1, column=1, padx=PADX, pady=PADY*2)
 
-    def show_menu(self):
-        self.pizzas.list_products()
-
     def cleaning_frame(self, frame):
         for widget in frame.winfo_children():
             widget.destroy()
@@ -352,35 +349,132 @@ class GUI:
 
         self.left = int(self.display_width / 2 - (WINDOW_WIDTH / 2))
         self.top = int(self.display_height / 2 - (WINDOW_HEIGHT / 2))
-        waiter_window.geometry(f"{WINDOW_WIDTH}x{WINDOW_HEIGHT}+{self.left}+{self.top}")
+        waiter_window.geometry(f"{int(WINDOW_WIDTH*1.5)}x{WINDOW_HEIGHT}+{self.left}+{self.top}")
         waiter_window.config(padx=PADX, pady=PADY)
-        waiter_window.minsize(int(WINDOW_WIDTH / 1.25), int(WINDOW_HEIGHT / 1.25))
+        waiter_window.minsize(int(WINDOW_WIDTH*1.5 / 1.25), int(WINDOW_HEIGHT / 1.25))
 
         # Multiple tabs for the waiter window
         notebook = ttk.Notebook(waiter_window)
         tab1 = ttk.Frame(notebook)
         tab2 = ttk.Frame(notebook)
-        notebook.add(tab1, text="Restaurant Menu")
-        notebook.add(tab2, text="Orders")
+        notebook.add(tab1, text="Take Orders")
+        notebook.add(tab2, text="Active Orders")
         notebook.pack(fill=tk.BOTH)
 
         left_frame1 = ttk.Frame(tab1, width=280, height=self.display_height, relief=tk.GROOVE)
         left_frame1.pack(side="left", fill=tk.Y, expand=True, padx=PADX)
         right_frame1 = ttk.Frame(tab1, width=self.display_width, height=self.display_height, relief=tk.GROOVE)
         right_frame1.pack(side="left", fill=tk.BOTH, expand=True)
+        right_frame1.pack_propagate(False)
 
         self.logo_in_waiter(left_frame1, "crazy_waiter_logo.png")
 
-        pizzas_button = ttk.Button(left_frame1, text="Pizzas", command=lambda: print("Pizzas"))
-        pizzas_button.pack(pady=PADY*2)
-        snacks_button = ttk.Button(left_frame1, text="Snacks", command=lambda: print("Snacks"))
-        snacks_button.pack(pady=PADY*2)
-        drinks_button = ttk.Button(left_frame1, text="Drinks", command=lambda: print("Drinks"))
-        drinks_button.pack(pady=PADY*2)
+        self.pizza = Pizza()
+        self.snack = Snack()
+        self.drink = Drink()
+
+        pizzas_button = ttk.Button(left_frame1, text="Pizzas", command=lambda: show_menu(right_frame1, "pizzas"))
+        pizzas_button.grid(row=1, column=0, padx=PADX, pady=PADY)
+        snacks_button = ttk.Button(left_frame1, text="Snacks", command=lambda: show_menu(right_frame1, "snacks"))
+        snacks_button.grid(row=1, column=1, padx=PADX, pady=PADY)
+        drinks_button = ttk.Button(left_frame1, text="Drinks", command=lambda: show_menu(right_frame1, "drinks"))
+        drinks_button.grid(row=1, column=2, padx=PADX, pady=PADY)
+
+        def update_item_list(event):
+            selected_item_type = item_type_combobox.get()
+            if selected_item_type == "Pizza":
+                items = self.pizza.list_products()
+            elif selected_item_type == "Snack":
+                items = self.snack.list_products()
+            elif selected_item_type == "Drink":
+                items = self.drink.list_products()
+            item_combobox['values'] = [item[2] for item in items]
+
+        # Function to display product details when an item is selected
+        def show_product_details(event):
+            selected_item_id = item_combobox.current() + 1
+            selected_item_type = item_type_combobox.get()
+            if selected_item_type == "Pizza":
+                product_attributes = self.pizza.select_product(selected_item_id)
+            elif selected_item_type == "Snack":
+                product_attributes = self.snack.select_product(selected_item_id)
+            elif selected_item_type == "Drink":
+                product_attributes = self.drink.select_product(selected_item_id)
+            name_label['text'] = f"Name: {product_attributes[2]}"
+
+        # Item type combobox
+        item_type_combobox = ttk.Combobox(left_frame1, values=["Pizza", "Snack", "Drink"])
+        item_type_combobox.grid(row=2, column=0)
+        item_type_combobox.bind("<<ComboboxSelected>>", update_item_list)
+
+        # Item list combobox
+        item_combobox = ttk.Combobox(left_frame1)
+        item_combobox.grid(row=2, column=1)
+        item_combobox.bind("<<ComboboxSelected>>", show_product_details)
+
+        # Label to display product details
+        name_label = ttk.Label(left_frame1, text="")
+        name_label.grid(row=2, column=2)
+
+        product_name_stringvar = tk.StringVar(value="N/A")
+        product_price_doublvar = tk.DoubleVar(value=0.0)
+        product_type_intvar = tk.IntVar(value=0)
+
+        product_name = ttk.Label(left_frame1, text="Product Name:")
+        product_name.grid(row=3, column=0, padx=PADX, pady=PADY*2)
+        item_name_label = ttk.Label(left_frame1, textvariable=product_name_stringvar)
+        item_name_label.grid(row=3, column=1, padx=PADX, pady=PADY*2)
+        product_price = ttk.Label(left_frame1, text="Product Price:")
+        product_price.grid(row=4, column=0, padx=PADX, pady=PADY)
+        item_price_label = ttk.Label(left_frame1, textvariable=product_price_doublvar)
+        item_price_label.grid(row=4, column=1, padx=PADX, pady=PADY)
+
+        take_order_button = ttk.Button(left_frame1, text="Take Order", command=self.take_order)
+        take_order_button.grid(row=5, column=0, padx=PADX, pady=PADY)
 
         # Placing grip at the corner
         grip = ttk.Sizegrip(waiter_window)
         grip.place(relx=1.0, rely=1.0, anchor="se")
+
+        @handle_errors
+        def show_menu(frame, item_type):
+            self.cleaning_frame(frame)
+            self.tree_menu = ttk.Treeview(frame, show="headings", selectmode="browse")
+            self.tree_menu["columns"] = ("ID", "Type", "Name", "Price", "Ingredients")
+            self.tree_menu.column("ID", anchor="center", width=25)
+            self.tree_menu.column("Type", anchor="center", width=50)
+            self.tree_menu.column("Name", anchor="center", width=200)
+            self.tree_menu.column("Price", anchor="center", width=50)
+            self.tree_menu.column("Ingredients", anchor="center", width=400)
+            self.tree_menu.heading("ID", text="ID")
+            self.tree_menu.heading("Type", text="Type")
+            self.tree_menu.heading("Name", text="Name")
+            self.tree_menu.heading("Price", text="Price")
+            self.tree_menu.heading("Ingredients", text="Ingredients")
+            self.tree_menu.pack(padx=PADX, pady=PADY, expand=True, fill=tk.BOTH)
+
+            self.pizza = Pizza()
+            self.snack = Snack()
+            self.drink = Drink()
+
+            pizzas = self.pizza.list_products()
+            snacks = self.snack.list_products()
+            drinks = self.drink.list_products()
+
+            if item_type == "pizzas":
+                for pizza in pizzas:
+                    self.tree_menu.insert("", "end", values=(pizza[0], "Pizza", pizza[2], pizza[3], pizza[4]))
+            elif item_type == "snacks":
+                for snack in snacks:
+                    self.tree_menu.insert("", "end", values=(snack[0], "Snack", snack[2], snack[3], snack[4]))
+            else:
+                for drink in drinks:
+                    self.tree_menu.insert("", "end", values=(drink[0], "Drink", drink[2], drink[3], drink[4]))
+
+
+
+    def take_order(self):
+        pass
 
     def chef_menu(self):
         # Chef Window Setup
@@ -427,7 +521,7 @@ class GUI:
 
     def logo_in_waiter(self, frame, logo):
         logo_canvas = tk.Canvas(frame, width=374, height=275)
-        logo_canvas.pack(padx=PADX, pady=PADY*2)
+        logo_canvas.grid(row=0, column=0, columnspan=3, padx=PADX, pady=PADY*2)
         self.waiter_image = tk.PhotoImage(file=f"{logo}")
         logo_canvas.create_image(187, 138, image=self.waiter_image)
 

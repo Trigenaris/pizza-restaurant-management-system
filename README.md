@@ -22,12 +22,12 @@ In this project; we focus on a **Restaurant Management**, specifically a made-up
 ## 📌 Main Features:
 * **login system** for the user to see the related menu on their screen.
 * 3 main menus refer to roles respectively: **Manager, Waiter, Chef**
-* It is planned that the system will have **custom message boxes** other than default ones in the tkinter. (WIP)
+* It is planned that the system will have **custom message boxes** other than default ones in the tkinter. (WIP) (EF)
 * Different roles have **different functionalities** to do that are **responsive** to each other.
 
 ### 👩‍💼 Features of the Manager:
 * Editing the menu (**Adding, updating or removing products**)
-* Checking the current, canceled, or completed orders.
+* Checking the current, canceled, or completed orders. (WIP)
 * Checking, and analyzing daily, weekly, monthly, or yearly reports. (WIP)
 * Detailed data analysis for the related report. (EF)
 

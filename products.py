@@ -46,6 +46,11 @@ class Product:
         products = self.cursor.execute(f'SELECT id, {self.product_type}, name, price, ingredients FROM {self.table_name}').fetchall()
         return products
 
+    def select_product(self, product_id):
+        product = self.cursor.execute(f'''SELECT id, {self.product_type}, name, price, ingredients 
+                                            FROM {self.table_name} WHERE id=?''', (product_id,)).fetchone()
+        return product
+
     # Closing database connection
     def close_connection(self):
         self.conn.close()
