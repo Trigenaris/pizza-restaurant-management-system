@@ -48,7 +48,7 @@ class Product:
 
     def select_product(self, product_id):
         product = self.cursor.execute(f'''SELECT id, {self.product_type}, name, price, ingredients 
-                                            FROM {self.table_name} WHERE id=?''', (product_id,)).fetchone()
+                                            FROM {self.table_name} WHERE name=?''', (product_id,)).fetchone()
         return product
 
     # Closing database connection

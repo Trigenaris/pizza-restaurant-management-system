@@ -390,44 +390,47 @@ class GUI:
                 items = self.drink.list_products()
             item_combobox['values'] = [item[2] for item in items]
 
-        # Function to display product details when an item is selected
         def show_product_details(event):
-            selected_item_id = item_combobox.current() + 1
+            selected_item_name = item_combobox.get()
+            print(selected_item_name)
             selected_item_type = item_type_combobox.get()
             if selected_item_type == "Pizza":
-                product_attributes = self.pizza.select_product(selected_item_id)
+                product_attributes = self.pizza.select_product(selected_item_name)
             elif selected_item_type == "Snack":
-                product_attributes = self.snack.select_product(selected_item_id)
+                product_attributes = self.snack.select_product(selected_item_name)
             elif selected_item_type == "Drink":
-                product_attributes = self.drink.select_product(selected_item_id)
-            name_label['text'] = f"Name: {product_attributes[2]}"
+                product_attributes = self.drink.select_product(selected_item_name)
+            item_name_label['text'] = product_attributes[2]
+            item_price_label['text'] = product_attributes[3]
 
         # Item type combobox
-        item_type_combobox = ttk.Combobox(left_frame1, values=["Pizza", "Snack", "Drink"])
+        item_type_combobox = ttk.Combobox(left_frame1, values=["Pizza", "Snack", "Drink"], width=10)
         item_type_combobox.grid(row=2, column=0)
         item_type_combobox.bind("<<ComboboxSelected>>", update_item_list)
 
         # Item list combobox
-        item_combobox = ttk.Combobox(left_frame1)
+        item_combobox = ttk.Combobox(left_frame1, width=10)
         item_combobox.grid(row=2, column=1)
         item_combobox.bind("<<ComboboxSelected>>", show_product_details)
 
-        # Label to display product details
-        name_label = ttk.Label(left_frame1, text="")
-        name_label.grid(row=2, column=2)
-
-        product_name_stringvar = tk.StringVar(value="N/A")
-        product_price_doublvar = tk.DoubleVar(value=0.0)
-        product_type_intvar = tk.IntVar(value=0)
+        # Item quantity spinbox
+        spinbox_int = tk.IntVar(value=0)
+        item_quantity_spinbox = ttk.Spinbox(left_frame1, from_=1, to=20, width=10,
+                                            command=lambda: print(spinbox_int.get()), textvariable=spinbox_int)
+        item_quantity_spinbox.grid(row=2, column=2)
 
         product_name = ttk.Label(left_frame1, text="Product Name:")
         product_name.grid(row=3, column=0, padx=PADX, pady=PADY*2)
-        item_name_label = ttk.Label(left_frame1, textvariable=product_name_stringvar)
+        item_name_label = ttk.Label(left_frame1, text="")
         item_name_label.grid(row=3, column=1, padx=PADX, pady=PADY*2)
         product_price = ttk.Label(left_frame1, text="Product Price:")
         product_price.grid(row=4, column=0, padx=PADX, pady=PADY)
-        item_price_label = ttk.Label(left_frame1, textvariable=product_price_doublvar)
+        item_price_label = ttk.Label(left_frame1, text="")
         item_price_label.grid(row=4, column=1, padx=PADX, pady=PADY)
+        product_quantity = ttk.Label(left_frame1, text="Quantity:")
+        product_quantity.grid(row=5, column=0, padx=PADX, pady=PADY*2)
+        item_quantity_label = ttk.Label(left_frame1, textvariable=spinbox_int)
+        item_quantity_label.grid(row=5, column=1, padx=PADX, pady=PADY*2)
 
         take_order_button = ttk.Button(left_frame1, text="Take Order", command=self.take_order)
         take_order_button.grid(row=5, column=0, padx=PADX, pady=PADY)
