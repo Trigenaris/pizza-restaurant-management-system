@@ -367,6 +367,7 @@ class GUI:
         notebook.add(tab2, text="Active Orders")
         notebook.pack(fill=tk.BOTH)
 
+        # First tab frames
         left_frame1 = ttk.Frame(tab1, width=280, height=self.display_height, relief=tk.GROOVE)
         left_frame1.pack(side="left", fill=tk.Y, expand=True, padx=PADX)
         right_frame1 = ttk.Frame(tab1, width=self.display_width, height=self.display_height, relief=tk.GROOVE)
@@ -375,6 +376,7 @@ class GUI:
 
         self.display_waiter_logo(left_frame1)
 
+        # Second tab frames
         left_frame2 = ttk.Frame(tab2, width=280, height=self.display_height, relief=tk.GROOVE)
         left_frame2.pack(side="left", fill=tk.Y, expand=True, padx=PADX)
         right_frame2 = ttk.Frame(tab2, width=self.display_width, height=self.display_height, relief=tk.GROOVE)
@@ -383,6 +385,7 @@ class GUI:
 
         self.display_waiter_logo(left_frame2)
 
+        # product instances
         self.pizza = Pizza()
         self.snack = Snack()
         self.drink = Drink()
@@ -414,8 +417,46 @@ class GUI:
                 product_attributes = self.snack.select_product(selected_item_name)
             elif selected_item_type == "Drink":
                 product_attributes = self.drink.select_product(selected_item_name)
+            item_id_label['text'] = product_attributes[0]
             item_name_label['text'] = product_attributes[2]
             item_price_label['text'] = product_attributes[3]
+
+        def get_order_details():
+            selected_item_name = item_combobox.get()
+            print(selected_item_name)
+            selected_item_type = item_type_combobox.get()
+            if selected_item_type == "Pizza":
+                product_attributes = self.pizza.select_product(selected_item_name)
+            elif selected_item_type == "Snack":
+                product_attributes = self.snack.select_product(selected_item_name)
+            elif selected_item_type == "Drink":
+                product_attributes = self.drink.select_product(selected_item_name)
+            item_id = product_attributes[0]
+            item_type = product_attributes[1]
+            item_price = product_attributes[3]
+            item_quantity = spinbox_int.get()
+            if item_quantity != 0:
+                item_details = (item_id, item_type, item_price, item_quantity)
+                return item_details
+            else:
+                messagebox.showwarning(title="Error!", message="Quantity must be greater than '0'")
+
+        def add_to_order():
+            global total_price
+            item_details = get_order_details()
+            if item_details:
+                quantity = item_details[3]
+                total_price += item_details[2] * quantity
+                total_price_amount_label.config(text=str(total_price))
+                current_item_name = item_name_label.cget("text")
+                total_orders_text = total_orders_name_label.cget("text")
+                total_orders_text += ", " + str(quantity) + " " + current_item_name
+                total_orders_name_label.config(text=total_orders_text)
+            else:
+                total_price_amount_label.config(text="")
+
+        def completing_order():
+            pass
 
         # Item type combobox
         item_type_combobox = ttk.Combobox(left_frame1, values=["Pizza", "Snack", "Drink"], width=10)
@@ -433,26 +474,36 @@ class GUI:
                                             command=lambda: print(spinbox_int.get()), textvariable=spinbox_int)
         item_quantity_spinbox.grid(row=2, column=2)
 
+        product_id = ttk.Label(left_frame1, text="Product ID:")
+        product_id.grid(row=3, column=0, padx=PADX, pady=PADY*2)
+        item_id_label = ttk.Label(left_frame1, text="")
+        item_id_label.grid(row=3, column=1, padx=PADX, pady=PADY*2)
         product_name = ttk.Label(left_frame1, text="Product Name:")
-        product_name.grid(row=3, column=0, padx=PADX, pady=PADY*2)
+        product_name.grid(row=4, column=0, padx=PADX, pady=PADY*2)
         item_name_label = ttk.Label(left_frame1, text="")
-        item_name_label.grid(row=3, column=1, padx=PADX, pady=PADY*2)
+        item_name_label.grid(row=4, column=1, padx=PADX, pady=PADY*2)
         product_price = ttk.Label(left_frame1, text="Product Price:")
-        product_price.grid(row=4, column=0, padx=PADX, pady=PADY)
+        product_price.grid(row=5, column=0, padx=PADX, pady=PADY)
         item_price_label = ttk.Label(left_frame1, text="")
-        item_price_label.grid(row=4, column=1, padx=PADX, pady=PADY)
+        item_price_label.grid(row=5, column=1, padx=PADX, pady=PADY)
         product_quantity = ttk.Label(left_frame1, text="Quantity:")
-        product_quantity.grid(row=5, column=0, padx=PADX, pady=PADY*2)
+        product_quantity.grid(row=6, column=0, padx=PADX, pady=PADY*2)
         item_quantity_label = ttk.Label(left_frame1, textvariable=spinbox_int)
-        item_quantity_label.grid(row=5, column=1, padx=PADX, pady=PADY*2)
+        item_quantity_label.grid(row=6, column=1, padx=PADX, pady=PADY*2)
 
         total_price_label = ttk.Label(left_frame1, text="Total: ")
-        total_price_label.grid(row=7, column=0, padx=PADX, pady=PADY)
+        total_price_label.grid(row=8, column=0, padx=PADX, pady=PADY)
         total_price_amount_label = ttk.Label(left_frame1, text="")
-        total_price_amount_label.grid(row=7, column=1, padx=PADX, pady=PADY)
+        total_price_amount_label.grid(row=8, column=1, padx=PADX, pady=PADY)
+        total_orders_label = ttk.Label(left_frame1, text="Ordered items: ")
+        total_orders_label.grid(row=9, column=0, padx=PADX, pady=PADY)
+        total_orders_name_label = ttk.Label(left_frame1, text="")
+        total_orders_name_label.grid(row=10, column=0, columnspan=3, padx=PADX)
 
-        add_to_order_button = ttk.Button(left_frame1, text="Add to Order", command=lambda: self.add_to_order)
-        add_to_order_button.grid(row=6, column=1, padx=PADX, pady=PADY)
+        add_to_order_button = ttk.Button(left_frame1, text="Add to Order", command=add_to_order)
+        add_to_order_button.grid(row=7, column=1, padx=PADX, pady=PADY)
+        complete_order = ttk.Button(left_frame1, text="Complete Order", command=completing_order)
+        complete_order.grid(row=11, column=1, padx=PADX, pady=PADY)
 
         # Placing grip at the corner
         grip = ttk.Sizegrip(waiter_window)
@@ -492,10 +543,6 @@ class GUI:
             else:
                 for drink in drinks:
                     self.tree_menu.insert("", "end", values=(drink[0], "Drink", drink[2], drink[3], drink[4]))
-
-    def add_to_order(self, item_type, item_name, item_quantity, item_price):
-        global total_price
-        total_price += item_price * item_quantity
 
     def chef_menu(self):
         # Chef Window Setup
