@@ -18,6 +18,8 @@ PADY = 5
 WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 600
 
+total_price = 0
+
 
 class GUI:
     def __init__(self, window):
@@ -64,6 +66,10 @@ class GUI:
 
         self.grip = ttk.Sizegrip(window)
         self.grip.place(relx=1.0, rely=1.0, anchor="se")
+
+        self.manager_images = []
+        self.waiter_images = []
+        self.chef_images = []
 
         # operative methods
         # self.manager_menu()
@@ -120,7 +126,7 @@ class GUI:
         right_frame1.pack(side="left", fill=tk.BOTH, expand=True)
         right_frame1.pack_propagate(False)
 
-        self.logo_in_manager(left_frame1, "crazy_manager_logo.png")
+        self.display_manager_logo(left_frame1)
 
         show_menu_button = ttk.Button(left_frame1, text="Show Menu", command=lambda: show_menu(right_frame1))
         show_menu_button.pack(pady=PADY)
@@ -349,9 +355,9 @@ class GUI:
 
         self.left = int(self.display_width / 2 - (WINDOW_WIDTH / 2))
         self.top = int(self.display_height / 2 - (WINDOW_HEIGHT / 2))
-        waiter_window.geometry(f"{int(WINDOW_WIDTH*1.5)}x{WINDOW_HEIGHT}+{self.left}+{self.top}")
+        waiter_window.geometry(f"{int(WINDOW_WIDTH*1.5)}x{int(WINDOW_HEIGHT*1.2)}+{self.left}+{self.top}")
         waiter_window.config(padx=PADX, pady=PADY)
-        waiter_window.minsize(int(WINDOW_WIDTH*1.5 / 1.25), int(WINDOW_HEIGHT / 1.25))
+        waiter_window.minsize(int(WINDOW_WIDTH*1.5 / 1.25), int(WINDOW_HEIGHT*1.2 / 1.25))
 
         # Multiple tabs for the waiter window
         notebook = ttk.Notebook(waiter_window)
@@ -367,7 +373,15 @@ class GUI:
         right_frame1.pack(side="left", fill=tk.BOTH, expand=True)
         right_frame1.pack_propagate(False)
 
-        self.logo_in_waiter(left_frame1, "crazy_waiter_logo.png")
+        self.display_waiter_logo(left_frame1)
+
+        left_frame2 = ttk.Frame(tab2, width=280, height=self.display_height, relief=tk.GROOVE)
+        left_frame2.pack(side="left", fill=tk.Y, expand=True, padx=PADX)
+        right_frame2 = ttk.Frame(tab2, width=self.display_width, height=self.display_height, relief=tk.GROOVE)
+        right_frame2.pack(side="left", fill=tk.BOTH, expand=True)
+        right_frame2.pack_propagate(False)
+
+        self.display_waiter_logo(left_frame2)
 
         self.pizza = Pizza()
         self.snack = Snack()
@@ -432,8 +446,13 @@ class GUI:
         item_quantity_label = ttk.Label(left_frame1, textvariable=spinbox_int)
         item_quantity_label.grid(row=5, column=1, padx=PADX, pady=PADY*2)
 
-        take_order_button = ttk.Button(left_frame1, text="Take Order", command=self.take_order)
-        take_order_button.grid(row=5, column=0, padx=PADX, pady=PADY)
+        total_price_label = ttk.Label(left_frame1, text="Total: ")
+        total_price_label.grid(row=7, column=0, padx=PADX, pady=PADY)
+        total_price_amount_label = ttk.Label(left_frame1, text="")
+        total_price_amount_label.grid(row=7, column=1, padx=PADX, pady=PADY)
+
+        add_to_order_button = ttk.Button(left_frame1, text="Add to Order", command=lambda: self.add_to_order)
+        add_to_order_button.grid(row=6, column=1, padx=PADX, pady=PADY)
 
         # Placing grip at the corner
         grip = ttk.Sizegrip(waiter_window)
@@ -474,10 +493,9 @@ class GUI:
                 for drink in drinks:
                     self.tree_menu.insert("", "end", values=(drink[0], "Drink", drink[2], drink[3], drink[4]))
 
-
-
-    def take_order(self):
-        pass
+    def add_to_order(self, item_type, item_name, item_quantity, item_price):
+        global total_price
+        total_price += item_price * item_quantity
 
     def chef_menu(self):
         # Chef Window Setup
@@ -503,7 +521,7 @@ class GUI:
         right_frame1 = ttk.Frame(tab1, width=self.display_width, height=self.display_height, relief=tk.GROOVE)
         right_frame1.pack(side="left", fill=tk.BOTH, expand=True)
 
-        self.logo_in_chef(left_frame1, "crazy_chef_logo.png")
+        self.display_chef_logo(left_frame1)
 
         pizzas_button = ttk.Button(left_frame1, text="Pizzas", command=lambda: print("Pizzas"))
         pizzas_button.pack(pady=PADY*2)
@@ -516,23 +534,26 @@ class GUI:
         grip = ttk.Sizegrip(chef_window)
         grip.place(relx=1.0, rely=1.0, anchor="se")
 
-    def logo_in_manager(self, frame, logo):
+    def display_manager_logo(self, frame):
         logo_canvas = tk.Canvas(frame, width=374, height=275)
-        logo_canvas.pack(padx=PADX, pady=PADY*2)
-        self.manager_image = tk.PhotoImage(file=f"{logo}")
-        logo_canvas.create_image(187, 138, image=self.manager_image)
+        logo_canvas.grid(row=0, column=0, columnspan=3, padx=PADX, pady=PADY * 2)
+        manager_image = tk.PhotoImage(file="crazy_manager_logo.png")
+        logo_canvas.create_image(187, 138, image=manager_image)
+        self.manager_images.append(manager_image)
 
-    def logo_in_waiter(self, frame, logo):
+    def display_waiter_logo(self, frame):
         logo_canvas = tk.Canvas(frame, width=374, height=275)
-        logo_canvas.grid(row=0, column=0, columnspan=3, padx=PADX, pady=PADY*2)
-        self.waiter_image = tk.PhotoImage(file=f"{logo}")
-        logo_canvas.create_image(187, 138, image=self.waiter_image)
+        logo_canvas.grid(row=0, column=0, columnspan=3, padx=PADX, pady=PADY * 2)
+        waiter_image = tk.PhotoImage(file="crazy_waiter_logo.png")
+        logo_canvas.create_image(187, 138, image=waiter_image)
+        self.waiter_images.append(waiter_image)
 
-    def logo_in_chef(self, frame, logo):
+    def display_chef_logo(self, frame):
         logo_canvas = tk.Canvas(frame, width=374, height=275)
-        logo_canvas.pack(padx=PADX, pady=PADY*2)
-        self.chef_image = tk.PhotoImage(file=f"{logo}")
-        logo_canvas.create_image(187, 138, image=self.chef_image)
+        logo_canvas.grid(row=0, column=0, columnspan=3, padx=PADX, pady=PADY * 2)
+        chef_image = tk.PhotoImage(file="crazy_chef_logo.png")
+        logo_canvas.create_image(187, 138, image=chef_image)
+        self.chef_images.append(chef_image)
 
 
 def main():
