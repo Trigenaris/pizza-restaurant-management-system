@@ -131,13 +131,13 @@ class GUI:
         self.display_manager_logo(left_frame1)
 
         show_menu_button = ttk.Button(left_frame1, text="Show Menu", command=lambda: show_menu(right_frame1))
-        show_menu_button.pack(pady=PADY)
+        show_menu_button.grid(row=1, column=1, padx=PADX, pady=PADY)
         add_product_button = ttk.Button(left_frame1, text="New Product", command=self.add_product)
-        add_product_button.pack(pady=PADY)
+        add_product_button.grid(row=2, column=1, padx=PADX, pady=PADY)
         remove_product_button = ttk.Button(left_frame1, text="Remove Product", command=lambda: self.remove_product(self.tree_menu))
-        remove_product_button.pack(pady=PADY)
+        remove_product_button.grid(row=3, column=1, padx=PADX, pady=PADY)
         update_product_button = ttk.Button(left_frame1, text="Update Product", command=lambda: self.update_product(self.tree_menu))
-        update_product_button.pack(pady=PADY)
+        update_product_button.grid(row=4, column=1, padx=PADX, pady=PADY)
 
         # Placing grip at the corner
         grip = ttk.Sizegrip(manager_window)
@@ -670,11 +670,11 @@ class GUI:
         self.display_chef_logo(left_frame1)
 
         pizzas_button = ttk.Button(left_frame1, text="Pizzas", command=lambda: print("Pizzas"))
-        pizzas_button.pack(pady=PADY*2)
+        pizzas_button.grid(row=1, column=1, padx=PADX, pady=PADY)
         snacks_button = ttk.Button(left_frame1, text="Snacks", command=lambda: print("Snacks"))
-        snacks_button.pack(pady=PADY*2)
+        snacks_button.grid(row=1, column=1, padx=PADX, pady=PADY)
         drinks_button = ttk.Button(left_frame1, text="Drinks", command=lambda: print("Drinks"))
-        drinks_button.pack(pady=PADY*2)
+        drinks_button.grid(row=1, column=1, padx=PADX, pady=PADY)
 
         # Placing grip at the corner
         grip = ttk.Sizegrip(chef_window)
