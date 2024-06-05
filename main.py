@@ -458,7 +458,13 @@ class GUI:
             else:
                 total_price_amount_label.config(text="")
 
-        # New window for submitting an order
+        def refresh_labels():
+            total_price_amount_label.config(text="")
+            total_orders_name_label.config(text="")
+            self.items = []
+            update_item_list(None)
+
+            # New window for submitting an order
         def completing_order():
             def show_temp_customer_frame():
                 temp_customer_frame.grid(row=1, column=0, columnspan=2, padx=10, pady=10)
@@ -471,6 +477,7 @@ class GUI:
             def submit_order():
                 customer_type = customer_type_var.get()
                 customer_id = None
+                total_float_price = (total_price_amount_label.cget('text'))
                 if customer_type == 0:
                     table_no = table_no_entry.get()
                     first_name = temp_first_name_entry.get()
@@ -486,8 +493,9 @@ class GUI:
                         customer_id = self.customers.add_perm_customer(first_name, last_name, email, address)
 
                 if customer_id:
-                    self.active_orders.take_order(customer_type, customer_id, self.items)
+                    self.active_orders.take_order(customer_type, customer_id, self.items, total_float_price)
                     messagebox.showinfo("Order Completed", "The order has been successfully completed!")
+                    refresh_labels()
                     order_window.destroy()
                 else:
                     messagebox.showerror("Oops!", "Please fill in all the required fields.")
@@ -499,9 +507,9 @@ class GUI:
 
             customer_type_var = tk.IntVar(value=0)
             temp_customer_rb = ttk.Radiobutton(order_window, text="Temporary Customer", variable=customer_type_var,
-                                              value=0, command=show_temp_customer_frame)
+                                               value=0, command=show_temp_customer_frame)
             perm_customer_rb = ttk.Radiobutton(order_window, text="Permanent Customer", variable=customer_type_var,
-                                              value=1, command=show_perm_customer_frame)
+                                               value=1, command=show_perm_customer_frame)
             temp_customer_rb.grid(row=0, column=0, padx=10, pady=10)
             perm_customer_rb.grid(row=0, column=1, padx=10, pady=10)
 
