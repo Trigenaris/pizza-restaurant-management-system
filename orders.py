@@ -77,6 +77,8 @@ class Orders:
 
     def take_order(self, customer_type, customer_id, items):
         total_price = 0
+        current_date = datetime.now().strftime('%Y-%m-%d')
+        current_time = datetime.now().strftime('%H:%M:%S')
         if customer_type == 0:  # temp_customers
             for item in items:
                 item_id, item_type, quantity = item
@@ -84,8 +86,8 @@ class Orders:
                 total_price += price * quantity
 
             self.cursor.execute(f'''INSERT INTO {self.table_name} (
-                temp_customer_id, total_price, order_taken_date, order_taken_hour) VALUES (?,?,?,?,?)''',
-                                (customer_id, total_price, self.current_time.date(), self.current_time.time()))
+                temp_customer_id, total_price, order_taken_date, order_taken_hour) VALUES (?,?,?,?)''',
+                                (customer_id, total_price, current_date, current_time))
             self.conn.commit()
             order_id = self.cursor.lastrowid
 
@@ -99,8 +101,8 @@ class Orders:
                 total_price += price * quantity
 
             self.cursor.execute(f'''INSERT INTO {self.table_name} (
-                customer_id, total_price, order_taken_date, order_taken_hour) VALUES (?,?,?,?,?)''',
-                                (customer_id, total_price, self.current_time.date(), self.current_time.time()))
+                customer_id, total_price, order_taken_date, order_taken_hour) VALUES (?,?,?,?)''',
+                                (customer_id, total_price, current_date, current_time))
             self.conn.commit()
             order_id = self.cursor.lastrowid
 

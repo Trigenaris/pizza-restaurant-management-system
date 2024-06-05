@@ -31,11 +31,11 @@ In this project; we focus on a **Restaurant Management**, specifically a made-up
 * Checking, and analyzing daily, weekly, monthly, or yearly reports. (WIP)
 * Detailed data analysis for the related report. (EF)
 
-### 🤵‍♀️ Features of the Waiter: (WIP)
+### 🤵‍♀️ Features of the Waiter: 
 * Checking the Menu.
 * Taking orders.
-* Cancelling orders.
-* Pinging **the taken orders** to the chef.
+* Cancelling orders. (WIP)
+* Pinging **the taken orders** to the chef. (WIP)
 
 ### 👩‍🍳 Features of the Chef: (WIP)
 * Checking the Menu.

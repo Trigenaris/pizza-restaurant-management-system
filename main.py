@@ -83,7 +83,9 @@ class GUI:
         self.active_orders = ActiveOrders()
         self.finished_orders = FinishedOrders()
         self.canceled_orders = CanceledOrders()
+        self.order_details = OrderDetails()
         self.customers = Customers()
+        self.items = []
 
     def login_process(self):
         user = self.user_string.get()
@@ -441,6 +443,7 @@ class GUI:
             else:
                 messagebox.showwarning(title="Error!", message="Quantity must be greater than '0'")
 
+        # Adding selected item to the current order
         def add_to_order():
             global total_price
             item_details = get_order_details()
@@ -455,8 +458,94 @@ class GUI:
             else:
                 total_price_amount_label.config(text="")
 
+        # New window for submitting an order
         def completing_order():
-            pass
+            def show_temp_customer_frame():
+                temp_customer_frame.grid(row=1, column=0, columnspan=2, padx=10, pady=10)
+                perm_customer_frame.grid_forget()
+
+            def show_perm_customer_frame():
+                perm_customer_frame.grid(row=1, column=0, columnspan=2, padx=10, pady=10)
+                temp_customer_frame.grid_forget()
+
+            def submit_order():
+                customer_type = customer_type_var.get()
+                customer_id = None
+                if customer_type == 0:
+                    table_no = table_no_entry.get()
+                    first_name = temp_first_name_entry.get()
+                    last_name = temp_last_name_entry.get()
+                    if table_no and first_name and last_name:
+                        customer_id = self.customers.add_temp_customer(table_no, first_name, last_name)
+                elif customer_type == 1:
+                    first_name = perm_first_name_entry.get()
+                    last_name = perm_last_name_entry.get()
+                    email = email_entry.get()
+                    address = address_entry.get()
+                    if first_name and last_name and email and address:
+                        customer_id = self.customers.add_perm_customer(first_name, last_name, email, address)
+
+                if customer_id:
+                    self.active_orders.take_order(customer_type, customer_id, self.items)
+                    messagebox.showinfo("Order Completed", "The order has been successfully completed!")
+                    order_window.destroy()
+                else:
+                    messagebox.showerror("Oops!", "Please fill in all the required fields.")
+
+            order_window = tk.Toplevel(self.window)
+            order_window.title("Complete Order")
+            order_window.geometry("350x250")
+            order_window.resizable(False, False)
+
+            customer_type_var = tk.IntVar(value=0)
+            temp_customer_rb = ttk.Radiobutton(order_window, text="Temporary Customer", variable=customer_type_var,
+                                              value=0, command=show_temp_customer_frame)
+            perm_customer_rb = ttk.Radiobutton(order_window, text="Permanent Customer", variable=customer_type_var,
+                                              value=1, command=show_perm_customer_frame)
+            temp_customer_rb.grid(row=0, column=0, padx=10, pady=10)
+            perm_customer_rb.grid(row=0, column=1, padx=10, pady=10)
+
+            temp_customer_frame = ttk.Frame(order_window)
+            table_no_label = ttk.Label(temp_customer_frame, text="Table No:")
+            table_no_label.grid(row=0, column=0, padx=10, pady=10)
+            table_no_entry = ttk.Entry(temp_customer_frame)
+            table_no_entry.grid(row=0, column=1, padx=10, pady=10)
+
+            temp_first_name_label = ttk.Label(temp_customer_frame, text="First Name:")
+            temp_first_name_label.grid(row=1, column=0, padx=10, pady=10)
+            temp_first_name_entry = ttk.Entry(temp_customer_frame)
+            temp_first_name_entry.grid(row=1, column=1, padx=10, pady=10)
+
+            temp_last_name_label = ttk.Label(temp_customer_frame, text="Last Name:")
+            temp_last_name_label.grid(row=2, column=0, padx=10, pady=10)
+            temp_last_name_entry = ttk.Entry(temp_customer_frame)
+            temp_last_name_entry.grid(row=2, column=1, padx=10, pady=10)
+
+            perm_customer_frame = ttk.Frame(order_window)
+            perm_first_name_label = ttk.Label(perm_customer_frame, text="First Name:")
+            perm_first_name_label.grid(row=0, column=0, padx=10, pady=10)
+            perm_first_name_entry = ttk.Entry(perm_customer_frame)
+            perm_first_name_entry.grid(row=0, column=1, padx=10, pady=10)
+
+            perm_last_name_label = ttk.Label(perm_customer_frame, text="Last Name:")
+            perm_last_name_label.grid(row=1, column=0, padx=10, pady=10)
+            perm_last_name_entry = ttk.Entry(perm_customer_frame)
+            perm_last_name_entry.grid(row=1, column=1, padx=10, pady=10)
+
+            email_label = ttk.Label(perm_customer_frame, text="Email:")
+            email_label.grid(row=2, column=0, padx=10, pady=10)
+            email_entry = ttk.Entry(perm_customer_frame)
+            email_entry.grid(row=2, column=1, padx=10, pady=10)
+
+            address_label = ttk.Label(perm_customer_frame, text="Address:")
+            address_label.grid(row=3, column=0, padx=10, pady=10)
+            address_entry = ttk.Entry(perm_customer_frame)
+            address_entry.grid(row=3, column=1, padx=10, pady=10)
+
+            submit_button = ttk.Button(order_window, text="Submit Order", command=submit_order)
+            submit_button.grid(row=2, column=0, columnspan=2, padx=10, pady=10)
+
+            show_temp_customer_frame()
 
         # Item type combobox
         item_type_combobox = ttk.Combobox(left_frame1, values=["Pizza", "Snack", "Drink"], width=10)
@@ -504,6 +593,8 @@ class GUI:
         add_to_order_button.grid(row=7, column=1, padx=PADX, pady=PADY)
         complete_order = ttk.Button(left_frame1, text="Complete Order", command=completing_order)
         complete_order.grid(row=11, column=1, padx=PADX, pady=PADY)
+        clean_order_button = ttk.Button(left_frame1, text="Clear Order", command=lambda: self.cleaning_frame)
+        clean_order_button.grid(row=7, column=0, padx=PADX, pady=PADY)
 
         # Placing grip at the corner
         grip = ttk.Sizegrip(waiter_window)

@@ -32,8 +32,10 @@ class Customers:
         self.cursor.execute('INSERT INTO customers (first_name, last_name, email, address) VALUES (?,?,?,?)',
                             (first_name, last_name, email, address))
         self.conn.commit()
+        return self.cursor.lastrowid
 
     def add_temp_customer(self, table_no, first_name, last_name):
         self.cursor.execute('INSERT INTO temp_customers (table_no, first_name, last_name) VALUES (?,?,?)',
                             (table_no, first_name, last_name))
         self.conn.commit()
+        return self.cursor.lastrowid
