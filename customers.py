@@ -39,3 +39,7 @@ class Customers:
                             (table_no, first_name, last_name))
         self.conn.commit()
         return self.cursor.lastrowid
+
+    def get_table_no(self, customer_id):
+        table_no = self.cursor.execute('SELECT table_no FROM temp_customers WHERE id=?', (customer_id,)).fetchone()
+        return table_no[0] if table_no else None

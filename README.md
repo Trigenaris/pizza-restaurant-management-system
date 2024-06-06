@@ -11,6 +11,7 @@ In this project; we focus on a **Restaurant Management**, specifically a made-up
 * sqlite3
 * tkinter
 * datetime
+* functools (for the decorator)
 * winsound (for the custom message boxes)
 
 #### ❓ Abbreviations: 
@@ -27,17 +28,17 @@ In this project; we focus on a **Restaurant Management**, specifically a made-up
 
 ### 👩‍💼 Features of the Manager:
 * Editing the menu (**Adding, updating or removing products**)
-* Checking the current, canceled, or completed orders. (WIP)
+* Checking the current, canceled, or completed orders.
 * Checking, and analyzing daily, weekly, monthly, or yearly reports. (WIP)
 * Detailed data analysis for the related report. (EF)
 
 ### 🤵‍♀️ Features of the Waiter: 
 * Checking the Menu.
 * Taking orders.
-* Cancelling orders. (WIP)
-* Pinging **the taken orders** to the chef. (WIP)
+* Cancelling orders.
+* Pinging **the taken orders** to the chef.
 
-### 👩‍🍳 Features of the Chef: (WIP)
+### 👩‍🍳 Features of the Chef:
 * Checking the Menu.
 * Checking the taken orders.
 * Pinging **the prepared orders** to the waiter.

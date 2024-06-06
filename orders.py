@@ -15,8 +15,8 @@ class OrderDetails:
             CREATE TABLE IF NOT EXISTS order_details (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 order_id INTEGER,
-                item_type INTEGER,
                 item_id INTEGER,
+                item_type INTEGER,
                 item_name VARCHAR(200),
                 quantity INTEGER,
                 FOREIGN KEY (order_id) REFERENCES Orders(id),
@@ -26,7 +26,7 @@ class OrderDetails:
         ''')
 
     def add_order_details(self, order_id, item_type, item_id, item_name, quantity):
-        self.cursor.execute('INSERT INTO order_details (order_id, item_type, item_id, item_name, quantity) VALUES (?,?,?,?,?)',
+        self.cursor.execute('INSERT INTO order_details (order_id, item_id, item_type, item_name, quantity) VALUES (?,?,?,?,?)',
                             (order_id, item_type, item_id, item_name, quantity))
         self.conn.commit()
 
@@ -44,10 +44,6 @@ class OrderDetails:
                             ''', (order_id,))
         order_items = self.cursor.fetchall()
         return order_items
-
-    def delete_order_details(self, order_id):
-        self.cursor.execute('DELETE FROM order_details WHERE order_id = ?', (order_id,))
-        self.conn.commit()
 
 
 class Orders:
@@ -120,43 +116,36 @@ class Orders:
         self.cursor.execute(f'''
         SELECT 
             o.id,
-            o.customer_id,
+            o.temp_customer_id,
             o.total_price,
             o.order_taken_date,
             o.order_taken_hour,
             GROUP_CONCAT(order_details.item_name || ' (' || order_details.quantity || ')', ', ') AS items
         FROM {self.table_name} AS o
         JOIN order_details ON o.id = order_details.order_id
-        GROUP BY o.id, o.customer_id, o.total_price, o.order_taken_date, o.order_taken_hour''')
+        GROUP BY o.id, o.temp_customer_id, o.total_price, o.order_taken_date, o.order_taken_hour''')
         print("Active Orders")
         return self.cursor.fetchall()
 
-    def finished_order(self, order_id):
-        prepared_time = self.current_time.time()
-        if order_id:
-            self.cursor.execute(f'UPDATE {self.table_name} SET order_prepared_hour=? WHERE id=?',
-                                (prepared_time, order_id))
-            self.conn.commit()
-            # Move the order to the finished_orders table
-            self.cursor.execute(f'INSERT INTO finished_orders SELECT * FROM {self.table_name} WHERE id=?', (order_id,))
-            self.conn.commit()
-            return True
-        else:
-            print("Error! Wrong order id!")
-            return False
+    def get_finished_orders(self):
+        self.cursor.execute(f'''
+        SELECT 
+            o.id,
+            o.temp_customer_id,
+            o.total_price,
+            o.order_taken_date,
+            o.order_taken_hour,
+            o.order_prepared_hour,
+            GROUP_CONCAT(order_details.item_name || ' (' || order_details.quantity || ')', ', ') AS items
+        FROM {self.table_name} AS o
+        JOIN order_details ON o.id = order_details.order_id
+        GROUP BY o.id, o.temp_customer_id, o.total_price, o.order_taken_date, o.order_taken_hour, o.order_prepared_hour''')
+        print("Finished Orders")
+        return self.cursor.fetchall()
 
-    def copy_order(self, order_id):
-        order_details = self.cursor.execute(f'SELECT * FROM {self.table_name} WHERE id=?', (order_id,)).fetchone()
-        return order_details[1:] if order_details else 0
-
-    def insert_order(self, order_details):
-        self.cursor.execute(f'''INSERT INTO {self.table_name} (
-        temp_customer_id, pizza_id, snack_id, drink_id, pizza_quantity, snack_quantity, drink_quantity, total_price,
-        order_taken_date, order_taken_hour) VALUES (?,?,?,?,?,?,?,?,?)''', (order_details,))
-        self.conn.commit()
-
-    def delete_order(self, order_id):
-        self.cursor.execute(f'DELETE FROM {self.table_name} WHERE id=?', (order_id,))
+    def cancel_order(self, order_id):
+        self.cursor.execute(f"DELETE FROM order_details WHERE order_id = ?", (order_id,))
+        self.cursor.execute(f"DELETE FROM {self.table_name} WHERE id = ?", (order_id,))
         self.conn.commit()
 
     def get_product_price(self, item_type, product_id):
@@ -176,6 +165,26 @@ class Orders:
 class ActiveOrders(Orders):
     def __init__(self):
         super().__init__('active_orders')
+
+    def finished_order(self, order_id):
+        prepared_time = datetime.now().strftime('%H:%M:%S')
+        if order_id:
+            try:
+                self.cursor.execute(f'UPDATE active_orders SET order_prepared_hour=? WHERE id=?',
+                                    (prepared_time, order_id))
+
+                self.cursor.execute(f'INSERT INTO finished_orders SELECT * FROM active_orders WHERE id=?', (order_id,))
+                self.cursor.execute(f"DELETE FROM active_orders WHERE id = ?", (order_id,))
+                self.conn.commit()
+                return True
+            except Exception as e:
+                print(f"Error: {e}")
+                # To prevent data loss
+                self.conn.rollback()
+                return False
+        else:
+            print("Error! Wrong order id!")
+            return False
 
 
 class FinishedOrders(Orders):

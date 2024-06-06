@@ -23,7 +23,7 @@ total_price = 0
 
 class GUI:
     def __init__(self, window):
-        # window setup
+        # main window setup
         self.window = window
         self.window.title("Crazy Pizza Restaurant Management System")
         self.display_width = window.winfo_screenwidth()
@@ -67,14 +67,10 @@ class GUI:
         self.grip = ttk.Sizegrip(window)
         self.grip.place(relx=1.0, rely=1.0, anchor="se")
 
+        # Storing images for each tab
         self.manager_images = []
         self.waiter_images = []
         self.chef_images = []
-
-        # operative methods
-        # self.manager_menu()
-        # self.waiter_menu()
-        # self.chef_menu()
 
         # database instances
         self.pizzas = Pizza()
@@ -97,8 +93,8 @@ class GUI:
         elif user == "Chef":
             self.chef_menu()
         else:
-            # custom_showerror(self.window, title="Error!", message="Oops! \nInvalid username or password.")
-            messagebox.showerror(title="Error!", message="Oops! \nInvalid username or password.")
+            custom_showerror(self.window, title="Error!", message="Oops! \nInvalid username or password.")
+            # messagebox.showerror(title="Error!", message="Oops! \nInvalid username or password.")
 
     def manager_menu(self):
         # Manager Window Setup
@@ -116,12 +112,14 @@ class GUI:
         tab1 = ttk.Frame(notebook)
         tab2 = ttk.Frame(notebook)
         tab3 = ttk.Frame(notebook)
+        tab4 = ttk.Frame(notebook)
         notebook.add(tab1, text="Menu Management")
-        notebook.add(tab2, text="Orders")
-        notebook.add(tab3, text="<Placeholder>")
+        notebook.add(tab2, text="Active Orders")
+        notebook.add(tab3, text="Finished Orders")
+        notebook.add(tab4, text="<Placeholder>")
         notebook.pack(fill=tk.BOTH)
 
-        # tab1 Menu Management window layout
+        # First tab frames
         left_frame1 = ttk.Frame(tab1, width=280, height=self.display_height, relief=tk.GROOVE)
         left_frame1.pack(side="left", fill=tk.Y, expand=True, padx=PADX)
         right_frame1 = ttk.Frame(tab1, width=self.display_width, height=self.display_height, relief=tk.GROOVE)
@@ -129,6 +127,33 @@ class GUI:
         right_frame1.pack_propagate(False)
 
         self.display_manager_logo(left_frame1)
+
+        # Second tab frames
+        left_frame2 = ttk.Frame(tab2, width=280, height=self.display_height, relief=tk.GROOVE)
+        left_frame2.pack(side="left", fill=tk.Y, expand=True, padx=PADX)
+        right_frame2 = ttk.Frame(tab2, width=self.display_width, height=self.display_height, relief=tk.GROOVE)
+        right_frame2.pack(side="left", fill=tk.BOTH, expand=True)
+        right_frame2.pack_propagate(False)
+
+        self.display_manager_logo(left_frame2)
+
+        # Third tab frames
+        left_frame3 = ttk.Frame(tab3, width=280, height=self.display_height, relief=tk.GROOVE)
+        left_frame3.pack(side="left", fill=tk.Y, expand=True, padx=PADX)
+        right_frame3 = ttk.Frame(tab3, width=self.display_width, height=self.display_height, relief=tk.GROOVE)
+        right_frame3.pack(side="left", fill=tk.BOTH, expand=True)
+        right_frame3.pack_propagate(False)
+
+        self.display_manager_logo(left_frame3)
+
+        # Fourth tab frames
+        left_frame4 = ttk.Frame(tab4, width=280, height=self.display_height, relief=tk.GROOVE)
+        left_frame4.pack(side="left", fill=tk.Y, expand=True, padx=PADX)
+        right_frame4 = ttk.Frame(tab4, width=self.display_width, height=self.display_height, relief=tk.GROOVE)
+        right_frame4.pack(side="left", fill=tk.BOTH, expand=True)
+        right_frame4.pack_propagate(False)
+
+        self.display_manager_logo(left_frame4)
 
         show_menu_button = ttk.Button(left_frame1, text="Show Menu", command=lambda: show_menu(right_frame1))
         show_menu_button.grid(row=1, column=1, padx=PADX, pady=PADY)
@@ -138,6 +163,64 @@ class GUI:
         remove_product_button.grid(row=3, column=1, padx=PADX, pady=PADY)
         update_product_button = ttk.Button(left_frame1, text="Update Product", command=lambda: self.update_product(self.tree_menu))
         update_product_button.grid(row=4, column=1, padx=PADX, pady=PADY)
+
+        @handle_errors
+        def show_active_orders(frame):
+            global tree_active_orders
+            self.cleaning_frame(frame)
+            tree_active_orders = ttk.Treeview(frame, show="headings", selectmode="browse")
+            tree_active_orders["columns"] = (
+                "Order ID", "Table No", "Total Price", "Order Date", "Order Hour", "Items")
+            tree_active_orders.column("Order ID", anchor="center", width=80)
+            tree_active_orders.column("Table No", anchor="center", width=100)
+            tree_active_orders.column("Total Price", anchor="center", width=100)
+            tree_active_orders.column("Order Date", anchor="center", width=100)
+            tree_active_orders.column("Order Hour", anchor="center", width=100)
+            tree_active_orders.column("Items", anchor="center", width=300)
+            tree_active_orders.heading("Order ID", text="Order ID")
+            tree_active_orders.heading("Table No", text="Table No")
+            tree_active_orders.heading("Total Price", text="Total Price")
+            tree_active_orders.heading("Order Date", text="Order Date")
+            tree_active_orders.heading("Order Hour", text="Order Hour")
+            tree_active_orders.heading("Items", text="Items")
+            tree_active_orders.pack(padx=PADX, pady=PADY, expand=True, fill=tk.BOTH)
+
+            active_orders = self.active_orders.get_active_orders()
+            print(f"Active Orders: {active_orders}")
+            for order in active_orders:
+                table_no = self.customers.get_table_no(order[1])
+                print(f"Inserting order: {order}")
+                order_with_table = (order[0], table_no, order[2], order[3], order[4], order[5])
+                tree_active_orders.insert("", "end", values=order_with_table)
+
+        @handle_errors
+        def show_finished_orders(frame):
+            self.cleaning_frame(frame)
+            tree_finished_orders = ttk.Treeview(frame, show="headings", selectmode="browse")
+            tree_finished_orders["columns"] = (
+                "Order ID", "Table No", "Total Price", "Order Date", "Order Hour", "Prepared Hour", "Items")
+            tree_finished_orders.column("Order ID", anchor="center", width=80)
+            tree_finished_orders.column("Table No", anchor="center", width=100)
+            tree_finished_orders.column("Total Price", anchor="center", width=100)
+            tree_finished_orders.column("Order Date", anchor="center", width=100)
+            tree_finished_orders.column("Order Hour", anchor="center", width=100)
+            tree_finished_orders.column("Prepared Hour", anchor="center", width=100)
+            tree_finished_orders.column("Items", anchor="center", width=300)
+            tree_finished_orders.heading("Order ID", text="Order ID")
+            tree_finished_orders.heading("Table No", text="Table No")
+            tree_finished_orders.heading("Total Price", text="Total Price")
+            tree_finished_orders.heading("Order Date", text="Order Date")
+            tree_finished_orders.heading("Order Hour", text="Order Hour")
+            tree_finished_orders.heading("Prepared Hour", text="Prepared Hour")
+            tree_finished_orders.heading("Items", text="Items")
+            tree_finished_orders.pack(padx=PADX, pady=PADY, expand=True, fill=tk.BOTH)
+
+            finished_orders = self.finished_orders.get_finished_orders()
+            for order in finished_orders:
+                table_no = self.customers.get_table_no(order[1])
+                print(f"Inserting order: {order}")
+                order_with_table = (order[0], table_no, order[2], order[3], order[4], order[5], order[6])
+                tree_finished_orders.insert("", "end", values=order_with_table)
 
         # Placing grip at the corner
         grip = ttk.Sizegrip(manager_window)
@@ -176,6 +259,21 @@ class GUI:
 
             for drink in drinks:
                 self.tree_menu.insert("", "end", values=(drink[0], "Drink", drink[2], drink[3], drink[4]))
+
+        # Second tab buttons
+        active_orders_button = ttk.Button(left_frame2, text="Show Active Orders",
+                                          command=lambda: show_active_orders(right_frame2))
+        active_orders_button.grid(row=1, column=1, padx=PADX, pady=PADY)
+
+        # Third tab buttons
+        finished_orders_button = ttk.Button(left_frame3, text="Show Finished Orders",
+                                            command=lambda: show_finished_orders(right_frame3))
+        finished_orders_button.grid(row=1, column=1, padx=PADX, pady=PADY*3)
+
+        notebook.bind("<<NotebookTabChanged>>",
+                      lambda event: show_active_orders(right_frame2) if notebook.index("current") == 1 else None)
+        notebook.bind("<<NotebookTabChanged>>",
+                      lambda event: show_finished_orders(right_frame3) if notebook.index("current") == 2 else None)
 
     @handle_errors
     def add_product(self):
@@ -365,8 +463,10 @@ class GUI:
         notebook = ttk.Notebook(waiter_window)
         tab1 = ttk.Frame(notebook)
         tab2 = ttk.Frame(notebook)
+        tab3 = ttk.Frame(notebook)
         notebook.add(tab1, text="Take Orders")
         notebook.add(tab2, text="Active Orders")
+        notebook.add(tab3, text="Finished Orders")
         notebook.pack(fill=tk.BOTH)
 
         # First tab frames
@@ -387,6 +487,14 @@ class GUI:
 
         self.display_waiter_logo(left_frame2)
 
+        left_frame3 = ttk.Frame(tab3, width=280, height=self.display_height, relief=tk.GROOVE)
+        left_frame3.pack(side="left", fill=tk.Y, expand=True, padx=PADX)
+        right_frame3 = ttk.Frame(tab3, width=self.display_width, height=self.display_height, relief=tk.GROOVE)
+        right_frame3.pack(side="left", fill=tk.BOTH, expand=True)
+        right_frame3.pack_propagate(False)
+
+        self.display_waiter_logo(left_frame3)
+
         # product instances
         self.pizza = Pizza()
         self.snack = Snack()
@@ -399,19 +507,21 @@ class GUI:
         drinks_button = ttk.Button(left_frame1, text="Drinks", command=lambda: show_menu(right_frame1, "drinks"))
         drinks_button.grid(row=1, column=2, padx=PADX, pady=PADY)
 
+        @handle_errors
         def show_active_orders(frame):
+            global tree_active_orders
             self.cleaning_frame(frame)
             tree_active_orders = ttk.Treeview(frame, show="headings", selectmode="browse")
             tree_active_orders["columns"] = (
-                "Order ID", "Customer ID", "Total Price", "Order Date", "Order Hour", "Items")
+                "Order ID", "Table No", "Total Price", "Order Date", "Order Hour", "Items")
             tree_active_orders.column("Order ID", anchor="center", width=80)
-            tree_active_orders.column("Customer ID", anchor="center", width=100)
+            tree_active_orders.column("Table No", anchor="center", width=100)
             tree_active_orders.column("Total Price", anchor="center", width=100)
             tree_active_orders.column("Order Date", anchor="center", width=100)
             tree_active_orders.column("Order Hour", anchor="center", width=100)
             tree_active_orders.column("Items", anchor="center", width=300)
             tree_active_orders.heading("Order ID", text="Order ID")
-            tree_active_orders.heading("Customer ID", text="Customer ID")
+            tree_active_orders.heading("Table No", text="Table No")
             tree_active_orders.heading("Total Price", text="Total Price")
             tree_active_orders.heading("Order Date", text="Order Date")
             tree_active_orders.heading("Order Hour", text="Order Hour")
@@ -421,9 +531,51 @@ class GUI:
             active_orders = self.active_orders.get_active_orders()
             print(f"Active Orders: {active_orders}")
             for order in active_orders:
+                table_no = self.customers.get_table_no(order[1])
                 print(f"Inserting order: {order}")
-                tree_active_orders.insert("", "end", values=order)
+                order_with_table = (order[0], table_no, order[2], order[3], order[4], order[5])
+                tree_active_orders.insert("", "end", values=order_with_table)
 
+        @handle_errors
+        def show_finished_orders(frame):
+            self.cleaning_frame(frame)
+            tree_finished_orders = ttk.Treeview(frame, show="headings", selectmode="browse")
+            tree_finished_orders["columns"] = (
+                "Order ID", "Table No", "Total Price", "Order Date", "Order Hour", "Prepared Hour", "Items")
+            tree_finished_orders.column("Order ID", anchor="center", width=80)
+            tree_finished_orders.column("Table No", anchor="center", width=100)
+            tree_finished_orders.column("Total Price", anchor="center", width=100)
+            tree_finished_orders.column("Order Date", anchor="center", width=100)
+            tree_finished_orders.column("Order Hour", anchor="center", width=100)
+            tree_finished_orders.column("Prepared Hour", anchor="center", width=100)
+            tree_finished_orders.column("Items", anchor="center", width=300)
+            tree_finished_orders.heading("Order ID", text="Order ID")
+            tree_finished_orders.heading("Table No", text="Table No")
+            tree_finished_orders.heading("Total Price", text="Total Price")
+            tree_finished_orders.heading("Order Date", text="Order Date")
+            tree_finished_orders.heading("Order Hour", text="Order Hour")
+            tree_finished_orders.heading("Prepared Hour", text="Prepared Hour")
+            tree_finished_orders.heading("Items", text="Items")
+            tree_finished_orders.pack(padx=PADX, pady=PADY, expand=True, fill=tk.BOTH)
+
+            finished_orders = self.finished_orders.get_finished_orders()
+            for order in finished_orders:
+                table_no = self.customers.get_table_no(order[1])
+                print(f"Inserting order: {order}")
+                order_with_table = (order[0], table_no, order[2], order[3], order[4], order[5], order[6])
+                tree_finished_orders.insert("", "end", values=order_with_table)
+
+        @handle_errors
+        def cancel_order(frame):
+            selected_item = tree_active_orders.selection()
+            if selected_item:
+                order_id = tree_active_orders.item(selected_item, 'values')[0]
+                self.active_orders.cancel_order(order_id)
+                show_active_orders(frame)
+            else:
+                messagebox.showwarning("Selection Error", "Please select an order to cancel.")
+
+        @handle_errors
         def update_item_list(event):
             selected_item_type = item_type_combobox.get()
             if selected_item_type == "Pizza":
@@ -434,6 +586,7 @@ class GUI:
                 items = self.drink.list_products()
             item_combobox['values'] = [item[2] for item in items]
 
+        @handle_errors
         def show_product_details(event):
             selected_item_name = item_combobox.get()
             print(selected_item_name)
@@ -448,6 +601,7 @@ class GUI:
             item_name_label['text'] = product_attributes[2]
             item_price_label['text'] = product_attributes[3]
 
+        @handle_errors
         def get_order_details():
             selected_item_name = item_combobox.get()
             print(selected_item_name)
@@ -470,6 +624,7 @@ class GUI:
                 messagebox.showwarning(title="Error!", message="Quantity must be greater than '0'")
 
         # Adding selected item to the current order
+        @handle_errors
         def add_to_order():
             global total_price
             item_details = get_order_details()
@@ -486,13 +641,15 @@ class GUI:
             else:
                 total_price_amount_label.config(text="")
 
+        @handle_errors
         def refresh_labels():
             total_price_amount_label.config(text="")
             total_orders_name_label.config(text="")
             self.items = []
             update_item_list(None)
 
-            # New window for submitting an order
+        # New window for submitting an order
+        @handle_errors
         def completing_order():
             def show_temp_customer_frame():
                 temp_customer_frame.grid(row=1, column=0, columnspan=2, padx=10, pady=10)
@@ -530,7 +687,7 @@ class GUI:
 
             order_window = tk.Toplevel(self.window)
             order_window.title("Complete Order")
-            order_window.geometry("350x250")
+            order_window.geometry("350x300")
             order_window.resizable(False, False)
 
             customer_type_var = tk.IntVar(value=0)
@@ -583,59 +740,63 @@ class GUI:
 
             show_temp_customer_frame()
 
+        item_type_combobox_label = ttk.Label(left_frame1, text="Product Type")
+        item_type_combobox_label.grid(row=2, column=0)
+        item_combobox_label = ttk.Label(left_frame1, text="Product Name")
+        item_combobox_label.grid(row=2, column=1)
+        item_quantity_spinbox_label = ttk.Label(left_frame1, text="Quantity")
+        item_quantity_spinbox_label.grid(row=2, column=2)
+
         # Item type combobox
         item_type_combobox = ttk.Combobox(left_frame1, values=["Pizza", "Snack", "Drink"], width=10)
-        item_type_combobox.grid(row=2, column=0)
+        item_type_combobox.grid(row=3, column=0)
         item_type_combobox.bind("<<ComboboxSelected>>", update_item_list)
 
         # Item list combobox
         item_combobox = ttk.Combobox(left_frame1, width=10)
-        item_combobox.grid(row=2, column=1)
+        item_combobox.grid(row=3, column=1)
         item_combobox.bind("<<ComboboxSelected>>", show_product_details)
 
         # Item quantity spinbox
         spinbox_int = tk.IntVar(value=0)
         item_quantity_spinbox = ttk.Spinbox(left_frame1, from_=1, to=20, width=10,
                                             command=lambda: print(spinbox_int.get()), textvariable=spinbox_int)
-        item_quantity_spinbox.grid(row=2, column=2)
+        item_quantity_spinbox.grid(row=3, column=2)
 
         product_id = ttk.Label(left_frame1, text="Product ID:")
-        product_id.grid(row=3, column=0, padx=PADX, pady=PADY*2)
+        product_id.grid(row=4, column=0, padx=PADX, pady=PADY*2)
         item_id_label = ttk.Label(left_frame1, text="")
-        item_id_label.grid(row=3, column=1, padx=PADX, pady=PADY*2)
+        item_id_label.grid(row=4, column=1, padx=PADX, pady=PADY*2)
         product_name = ttk.Label(left_frame1, text="Product Name:")
-        product_name.grid(row=4, column=0, padx=PADX, pady=PADY*2)
+        product_name.grid(row=5, column=0, padx=PADX, pady=PADY*2)
         item_name_label = ttk.Label(left_frame1, text="")
-        item_name_label.grid(row=4, column=1, padx=PADX, pady=PADY*2)
+        item_name_label.grid(row=5, column=1, padx=PADX, pady=PADY*2)
         product_price = ttk.Label(left_frame1, text="Product Price:")
-        product_price.grid(row=5, column=0, padx=PADX, pady=PADY)
+        product_price.grid(row=6, column=0, padx=PADX, pady=PADY)
         item_price_label = ttk.Label(left_frame1, text="")
-        item_price_label.grid(row=5, column=1, padx=PADX, pady=PADY)
+        item_price_label.grid(row=6, column=1, padx=PADX, pady=PADY)
         product_quantity = ttk.Label(left_frame1, text="Quantity:")
-        product_quantity.grid(row=6, column=0, padx=PADX, pady=PADY*2)
+        product_quantity.grid(row=7, column=0, padx=PADX, pady=PADY*2)
         item_quantity_label = ttk.Label(left_frame1, textvariable=spinbox_int)
-        item_quantity_label.grid(row=6, column=1, padx=PADX, pady=PADY*2)
+        item_quantity_label.grid(row=7, column=1, padx=PADX, pady=PADY*2)
 
         total_price_label = ttk.Label(left_frame1, text="Total: ")
-        total_price_label.grid(row=8, column=0, padx=PADX, pady=PADY)
+        total_price_label.grid(row=9, column=0, padx=PADX, pady=PADY)
         total_price_amount_label = ttk.Label(left_frame1, text="")
-        total_price_amount_label.grid(row=8, column=1, padx=PADX, pady=PADY)
+        total_price_amount_label.grid(row=9, column=1, padx=PADX, pady=PADY)
         total_orders_label = ttk.Label(left_frame1, text="Ordered items: ")
-        total_orders_label.grid(row=9, column=0, padx=PADX, pady=PADY)
+        total_orders_label.grid(row=10, column=0, padx=PADX, pady=PADY)
         total_orders_name_label = ttk.Label(left_frame1, text="")
-        total_orders_name_label.grid(row=10, column=0, columnspan=3, padx=PADX)
+        total_orders_name_label.grid(row=10, column=1, columnspan=3, padx=PADX)
 
         add_to_order_button = ttk.Button(left_frame1, text="Add to Order", command=add_to_order)
-        add_to_order_button.grid(row=7, column=1, padx=PADX, pady=PADY)
+        add_to_order_button.grid(row=8, column=1, padx=PADX, pady=PADY)
         complete_order = ttk.Button(left_frame1, text="Complete Order", command=completing_order)
         complete_order.grid(row=11, column=1, padx=PADX, pady=PADY)
-        clean_order_button = ttk.Button(left_frame1, text="Clear Order", command=lambda: self.cleaning_frame)
-        clean_order_button.grid(row=7, column=0, padx=PADX, pady=PADY)
 
         # Placing grip at the corner
         grip = ttk.Sizegrip(waiter_window)
         grip.place(relx=1.0, rely=1.0, anchor="se")
-
 
         @handle_errors
         def show_menu(frame, item_type):
@@ -672,12 +833,22 @@ class GUI:
                 for drink in drinks:
                     self.tree_menu.insert("", "end", values=(drink[0], "Drink", drink[2], drink[3], drink[4]))
 
+        # Second tab buttons
         active_orders_button = ttk.Button(left_frame2, text="Show Active Orders",
                                           command=lambda: show_active_orders(right_frame2))
         active_orders_button.grid(row=1, column=1, padx=PADX, pady=PADY)
+        cancel_order_button = ttk.Button(left_frame2, text="Cancel Order", command=lambda: cancel_order(right_frame2))
+        cancel_order_button.grid(row=2, column=1, padx=PADX, pady=PADY)
+
+        # Third tab buttons
+        finished_orders_button = ttk.Button(left_frame3, text="Show Finished Orders",
+                                            command=lambda: show_finished_orders(right_frame3))
+        finished_orders_button.grid(row=1, column=1, padx=PADX, pady=PADY*3)
 
         notebook.bind("<<NotebookTabChanged>>",
                       lambda event: show_active_orders(right_frame2) if notebook.index("current") == 1 else None)
+        notebook.bind("<<NotebookTabChanged>>",
+                      lambda event: show_finished_orders(right_frame3) if notebook.index("current") == 2 else None)
 
     def chef_menu(self):
         # Chef Window Setup
@@ -686,35 +857,178 @@ class GUI:
 
         self.left = int(self.display_width / 2 - (WINDOW_WIDTH / 2))
         self.top = int(self.display_height / 2 - (WINDOW_HEIGHT / 2))
-        chef_window.geometry(f"{WINDOW_WIDTH}x{WINDOW_HEIGHT}+{self.left}+{self.top}")
+        chef_window.geometry(f"{int(WINDOW_WIDTH*1.5)}x{int(WINDOW_HEIGHT*1.2)}+{self.left}+{self.top}")
         chef_window.config(padx=PADX, pady=PADY)
-        chef_window.minsize(int(WINDOW_WIDTH / 1.25), int(WINDOW_HEIGHT / 1.25))
+        chef_window.minsize(int(WINDOW_WIDTH*1.5 / 1.25), int(WINDOW_HEIGHT*1.2 / 1.25))
 
         # Multiple tabs for the chef window
         notebook = ttk.Notebook(chef_window)
         tab1 = ttk.Frame(notebook)
         tab2 = ttk.Frame(notebook)
+        tab3 = ttk.Frame(notebook)
         notebook.add(tab1, text="Restaurant Menu")
-        notebook.add(tab2, text="Orders")
+        notebook.add(tab2, text="Active Orders")
+        notebook.add(tab3, text="Finished Orders")
         notebook.pack(fill=tk.BOTH)
 
+        # First tab frames
         left_frame1 = ttk.Frame(tab1, width=280, height=self.display_height, relief=tk.GROOVE)
         left_frame1.pack(side="left", fill=tk.Y, expand=True, padx=PADX)
         right_frame1 = ttk.Frame(tab1, width=self.display_width, height=self.display_height, relief=tk.GROOVE)
         right_frame1.pack(side="left", fill=tk.BOTH, expand=True)
+        right_frame1.pack_propagate(False)
 
         self.display_chef_logo(left_frame1)
 
-        pizzas_button = ttk.Button(left_frame1, text="Pizzas", command=lambda: print("Pizzas"))
+        # Second tab frames
+        left_frame2 = ttk.Frame(tab2, width=280, height=self.display_height, relief=tk.GROOVE)
+        left_frame2.pack(side="left", fill=tk.Y, expand=True, padx=PADX)
+        right_frame2 = ttk.Frame(tab2, width=self.display_width, height=self.display_height, relief=tk.GROOVE)
+        right_frame2.pack(side="left", fill=tk.BOTH, expand=True)
+        right_frame2.pack_propagate(False)
+
+        self.display_chef_logo(left_frame2)
+
+        # Second tab frames
+        left_frame3 = ttk.Frame(tab3, width=280, height=self.display_height, relief=tk.GROOVE)
+        left_frame3.pack(side="left", fill=tk.Y, expand=True, padx=PADX)
+        right_frame3 = ttk.Frame(tab3, width=self.display_width, height=self.display_height, relief=tk.GROOVE)
+        right_frame3.pack(side="left", fill=tk.BOTH, expand=True)
+        right_frame3.pack_propagate(False)
+
+        self.display_chef_logo(left_frame3)
+
+        pizzas_button = ttk.Button(left_frame1, text="Pizzas", command=lambda: show_menu(right_frame1, "pizzas"))
         pizzas_button.grid(row=1, column=1, padx=PADX, pady=PADY)
-        snacks_button = ttk.Button(left_frame1, text="Snacks", command=lambda: print("Snacks"))
+        snacks_button = ttk.Button(left_frame1, text="Snacks", command=lambda: show_menu(right_frame1, "snacks"))
         snacks_button.grid(row=2, column=1, padx=PADX, pady=PADY)
-        drinks_button = ttk.Button(left_frame1, text="Drinks", command=lambda: print("Drinks"))
+        drinks_button = ttk.Button(left_frame1, text="Drinks", command=lambda: show_menu(right_frame1, "drinks"))
         drinks_button.grid(row=3, column=1, padx=PADX, pady=PADY)
+
+        @handle_errors
+        def order_ready(frame):
+            global tree_active_orders
+            selected_item = tree_active_orders.selection()
+            if selected_item:
+                order_id = tree_active_orders.item(selected_item, 'values')[0]
+                self.active_orders.finished_order(order_id)
+                show_active_orders(frame)
+            else:
+                messagebox.showwarning("Selection Error", "Please select the prepared order.")
+
+        @handle_errors
+        def show_active_orders(frame):
+            global tree_active_orders
+            self.cleaning_frame(frame)
+            tree_active_orders = ttk.Treeview(frame, show="headings", selectmode="browse")
+            tree_active_orders["columns"] = (
+                "Order ID", "Table No", "Total Price", "Order Date", "Order Hour", "Items")
+            tree_active_orders.column("Order ID", anchor="center", width=80)
+            tree_active_orders.column("Table No", anchor="center", width=100)
+            tree_active_orders.column("Total Price", anchor="center", width=100)
+            tree_active_orders.column("Order Date", anchor="center", width=100)
+            tree_active_orders.column("Order Hour", anchor="center", width=100)
+            tree_active_orders.column("Items", anchor="center", width=300)
+            tree_active_orders.heading("Order ID", text="Order ID")
+            tree_active_orders.heading("Table No", text="Table No")
+            tree_active_orders.heading("Total Price", text="Total Price")
+            tree_active_orders.heading("Order Date", text="Order Date")
+            tree_active_orders.heading("Order Hour", text="Order Hour")
+            tree_active_orders.heading("Items", text="Items")
+            tree_active_orders.pack(padx=PADX, pady=PADY, expand=True, fill=tk.BOTH)
+
+            active_orders = self.active_orders.get_active_orders()
+            print(f"Active Orders: {active_orders}")
+            for order in active_orders:
+                table_no = self.customers.get_table_no(order[1])
+                print(f"Inserting order: {order}")
+                order_with_table = (order[0], table_no, order[2], order[3], order[4], order[5])
+                tree_active_orders.insert("", "end", values=order_with_table)
+
+        @handle_errors
+        def show_finished_orders(frame):
+            self.cleaning_frame(frame)
+            tree_finished_orders = ttk.Treeview(frame, show="headings", selectmode="browse")
+            tree_finished_orders["columns"] = (
+                "Order ID", "Table No", "Total Price", "Order Date", "Order Hour", "Prepared Hour", "Items")
+            tree_finished_orders.column("Order ID", anchor="center", width=80)
+            tree_finished_orders.column("Table No", anchor="center", width=100)
+            tree_finished_orders.column("Total Price", anchor="center", width=100)
+            tree_finished_orders.column("Order Date", anchor="center", width=100)
+            tree_finished_orders.column("Order Hour", anchor="center", width=100)
+            tree_finished_orders.column("Prepared Hour", anchor="center", width=100)
+            tree_finished_orders.column("Items", anchor="center", width=300)
+            tree_finished_orders.heading("Order ID", text="Order ID")
+            tree_finished_orders.heading("Table No", text="Table No")
+            tree_finished_orders.heading("Total Price", text="Total Price")
+            tree_finished_orders.heading("Order Date", text="Order Date")
+            tree_finished_orders.heading("Order Hour", text="Order Hour")
+            tree_finished_orders.heading("Prepared Hour", text="Prepared Hour")
+            tree_finished_orders.heading("Items", text="Items")
+            tree_finished_orders.pack(padx=PADX, pady=PADY, expand=True, fill=tk.BOTH)
+
+            finished_orders = self.finished_orders.get_finished_orders()
+            for order in finished_orders:
+                table_no = self.customers.get_table_no(order[1])
+                print(f"Inserting order: {order}")
+                order_with_table = (order[0], table_no, order[2], order[3], order[4], order[5], order[6])
+                tree_finished_orders.insert("", "end", values=order_with_table)
 
         # Placing grip at the corner
         grip = ttk.Sizegrip(chef_window)
         grip.place(relx=1.0, rely=1.0, anchor="se")
+
+        @handle_errors
+        def show_menu(frame, item_type):
+            self.cleaning_frame(frame)
+            self.tree_menu = ttk.Treeview(frame, show="headings", selectmode="browse")
+            self.tree_menu["columns"] = ("ID", "Type", "Name", "Price", "Ingredients")
+            self.tree_menu.column("ID", anchor="center", width=25)
+            self.tree_menu.column("Type", anchor="center", width=50)
+            self.tree_menu.column("Name", anchor="center", width=200)
+            self.tree_menu.column("Price", anchor="center", width=50)
+            self.tree_menu.column("Ingredients", anchor="center", width=400)
+            self.tree_menu.heading("ID", text="ID")
+            self.tree_menu.heading("Type", text="Type")
+            self.tree_menu.heading("Name", text="Name")
+            self.tree_menu.heading("Price", text="Price")
+            self.tree_menu.heading("Ingredients", text="Ingredients")
+            self.tree_menu.pack(padx=PADX, pady=PADY, expand=True, fill=tk.BOTH)
+
+            self.pizza = Pizza()
+            self.snack = Snack()
+            self.drink = Drink()
+
+            pizzas = self.pizza.list_products()
+            snacks = self.snack.list_products()
+            drinks = self.drink.list_products()
+
+            if item_type == "pizzas":
+                for pizza in pizzas:
+                    self.tree_menu.insert("", "end", values=(pizza[0], "Pizza", pizza[2], pizza[3], pizza[4]))
+            elif item_type == "snacks":
+                for snack in snacks:
+                    self.tree_menu.insert("", "end", values=(snack[0], "Snack", snack[2], snack[3], snack[4]))
+            else:
+                for drink in drinks:
+                    self.tree_menu.insert("", "end", values=(drink[0], "Drink", drink[2], drink[3], drink[4]))
+
+        # Second tab buttons
+        active_orders_button = ttk.Button(left_frame2, text="Show Active Orders",
+                                          command=lambda: show_active_orders(right_frame2))
+        active_orders_button.grid(row=1, column=1, padx=PADX, pady=PADY)
+        order_ready_button = ttk.Button(left_frame2, text="Order Ready", command=lambda: order_ready(right_frame2))
+        order_ready_button.grid(row=2, column=1, padx=PADX, pady=PADY)
+
+        # Third tab buttons
+        finished_orders_button = ttk.Button(left_frame3, text="Show Finished Orders",
+                                            command=lambda: show_finished_orders(right_frame3))
+        finished_orders_button.grid(row=1, column=1, padx=PADX, pady=PADY*3)
+
+        notebook.bind("<<NotebookTabChanged>>",
+                      lambda event: show_active_orders(right_frame2) if notebook.index("current") == 1 else None)
+        notebook.bind("<<NotebookTabChanged>>",
+                      lambda event: show_finished_orders(right_frame3) if notebook.index("current") == 2 else None)
 
     def display_manager_logo(self, frame):
         logo_canvas = tk.Canvas(frame, width=374, height=275)
