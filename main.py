@@ -399,6 +399,31 @@ class GUI:
         drinks_button = ttk.Button(left_frame1, text="Drinks", command=lambda: show_menu(right_frame1, "drinks"))
         drinks_button.grid(row=1, column=2, padx=PADX, pady=PADY)
 
+        def show_active_orders(frame):
+            self.cleaning_frame(frame)
+            tree_active_orders = ttk.Treeview(frame, show="headings", selectmode="browse")
+            tree_active_orders["columns"] = (
+                "Order ID", "Customer ID", "Total Price", "Order Date", "Order Hour", "Items")
+            tree_active_orders.column("Order ID", anchor="center", width=80)
+            tree_active_orders.column("Customer ID", anchor="center", width=100)
+            tree_active_orders.column("Total Price", anchor="center", width=100)
+            tree_active_orders.column("Order Date", anchor="center", width=100)
+            tree_active_orders.column("Order Hour", anchor="center", width=100)
+            tree_active_orders.column("Items", anchor="center", width=300)
+            tree_active_orders.heading("Order ID", text="Order ID")
+            tree_active_orders.heading("Customer ID", text="Customer ID")
+            tree_active_orders.heading("Total Price", text="Total Price")
+            tree_active_orders.heading("Order Date", text="Order Date")
+            tree_active_orders.heading("Order Hour", text="Order Hour")
+            tree_active_orders.heading("Items", text="Items")
+            tree_active_orders.pack(padx=PADX, pady=PADY, expand=True, fill=tk.BOTH)
+
+            active_orders = self.active_orders.get_active_orders()
+            print(f"Active Orders: {active_orders}")
+            for order in active_orders:
+                print(f"Inserting order: {order}")
+                tree_active_orders.insert("", "end", values=order)
+
         def update_item_list(event):
             selected_item_type = item_type_combobox.get()
             if selected_item_type == "Pizza":
@@ -435,10 +460,11 @@ class GUI:
                 product_attributes = self.drink.select_product(selected_item_name)
             item_id = product_attributes[0]
             item_type = product_attributes[1]
+            item_name = product_attributes[2]
             item_price = product_attributes[3]
             item_quantity = spinbox_int.get()
             if item_quantity != 0:
-                item_details = (item_id, item_type, item_price, item_quantity)
+                item_details = (item_id, item_type, item_name, item_price, item_quantity)
                 return item_details
             else:
                 messagebox.showwarning(title="Error!", message="Quantity must be greater than '0'")
@@ -448,13 +474,15 @@ class GUI:
             global total_price
             item_details = get_order_details()
             if item_details:
-                quantity = item_details[3]
-                total_price += item_details[2] * quantity
+                quantity = item_details[4]
+                total_price += item_details[3] * quantity
                 total_price_amount_label.config(text=str(total_price))
-                current_item_name = item_name_label.cget("text")
+                current_item_name = item_details[2]
                 total_orders_text = total_orders_name_label.cget("text")
                 total_orders_text += ", " + str(quantity) + " " + current_item_name
                 total_orders_name_label.config(text=total_orders_text)
+
+                self.items.append(item_details)
             else:
                 total_price_amount_label.config(text="")
 
@@ -608,6 +636,7 @@ class GUI:
         grip = ttk.Sizegrip(waiter_window)
         grip.place(relx=1.0, rely=1.0, anchor="se")
 
+
         @handle_errors
         def show_menu(frame, item_type):
             self.cleaning_frame(frame)
@@ -643,6 +672,13 @@ class GUI:
                 for drink in drinks:
                     self.tree_menu.insert("", "end", values=(drink[0], "Drink", drink[2], drink[3], drink[4]))
 
+        active_orders_button = ttk.Button(left_frame2, text="Show Active Orders",
+                                          command=lambda: show_active_orders(right_frame2))
+        active_orders_button.grid(row=1, column=1, padx=PADX, pady=PADY)
+
+        notebook.bind("<<NotebookTabChanged>>",
+                      lambda event: show_active_orders(right_frame2) if notebook.index("current") == 1 else None)
+
     def chef_menu(self):
         # Chef Window Setup
         chef_window = tk.Toplevel(self.window)
@@ -672,9 +708,9 @@ class GUI:
         pizzas_button = ttk.Button(left_frame1, text="Pizzas", command=lambda: print("Pizzas"))
         pizzas_button.grid(row=1, column=1, padx=PADX, pady=PADY)
         snacks_button = ttk.Button(left_frame1, text="Snacks", command=lambda: print("Snacks"))
-        snacks_button.grid(row=1, column=1, padx=PADX, pady=PADY)
+        snacks_button.grid(row=2, column=1, padx=PADX, pady=PADY)
         drinks_button = ttk.Button(left_frame1, text="Drinks", command=lambda: print("Drinks"))
-        drinks_button.grid(row=1, column=1, padx=PADX, pady=PADY)
+        drinks_button.grid(row=3, column=1, padx=PADX, pady=PADY)
 
         # Placing grip at the corner
         grip = ttk.Sizegrip(chef_window)

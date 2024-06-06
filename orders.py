@@ -17,6 +17,7 @@ class OrderDetails:
                 order_id INTEGER,
                 item_type INTEGER,
                 item_id INTEGER,
+                item_name VARCHAR(200),
                 quantity INTEGER,
                 FOREIGN KEY (order_id) REFERENCES Orders(id),
                 FOREIGN KEY (item_type) REFERENCES Products(type),
@@ -24,9 +25,9 @@ class OrderDetails:
             )
         ''')
 
-    def add_order_details(self, order_id, item_type, item_id, quantity):
-        self.cursor.execute('INSERT INTO order_details (order_id, item_type, item_id, quantity) VALUES (?,?,?,?)',
-                            (order_id, item_type, item_id, quantity))
+    def add_order_details(self, order_id, item_type, item_id, item_name, quantity):
+        self.cursor.execute('INSERT INTO order_details (order_id, item_type, item_id, item_name, quantity) VALUES (?,?,?,?,?)',
+                            (order_id, item_type, item_id, item_name, quantity))
         self.conn.commit()
 
     def get_order_items(self, order_id):
@@ -76,14 +77,15 @@ class Orders:
         self.conn.commit()
 
     def take_order(self, customer_type, customer_id, items, total_price):
-        # total_price = 0
+        total_price = 0
         current_date = datetime.now().strftime('%Y-%m-%d')
         current_time = datetime.now().strftime('%H:%M:%S')
         if customer_type == 0:  # temp_customers
             for item in items:
-                item_id, item_type, quantity = item
-                # price = self.get_product_price(item_type, item_id)
-                # total_price += price * quantity
+                item_id, item_type, item_name, item_price, quantity = item
+                price = self.get_product_price(item_type, item_id)
+                total_price += float(price) * int(quantity)
+                item_name = self.get_product_name(item_type, item_id)
 
             self.cursor.execute(f'''INSERT INTO {self.table_name} (
                 temp_customer_id, total_price, order_taken_date, order_taken_hour) VALUES (?,?,?,?)''',
@@ -92,13 +94,15 @@ class Orders:
             order_id = self.cursor.lastrowid
 
             for item in items:
-                item_id, item_type, quantity = item
-                self.order_details.add_order_details(order_id, item_id, item_type, quantity)
+                item_id, item_type, item_name, item_price, quantity = item
+                item_name = self.get_product_name(item_type, item_id)
+                self.order_details.add_order_details(order_id, item_id, item_type, item_name, quantity)
         else:
             for item in items:
-                item_id, item_type, quantity = item
+                item_id, item_type, item_name, item_price, quantity = item
                 price = self.get_product_price(item_type, item_id)
-                total_price += price * quantity
+                total_price += float(price) * int(quantity)
+                item_name = self.get_product_name(item_type, item_id)
 
             self.cursor.execute(f'''INSERT INTO {self.table_name} (
                 customer_id, total_price, order_taken_date, order_taken_hour) VALUES (?,?,?,?)''',
@@ -107,20 +111,25 @@ class Orders:
             order_id = self.cursor.lastrowid
 
             for item in items:
-                item_id, item_type, quantity = item
-                self.order_details.add_order_details(order_id, item_id, item_type, quantity)
+                item_id, item_type, item_name, item_price, quantity = item
+                item_name = self.get_product_name(item_type, item_id)
+                self.order_details.add_order_details(order_id, item_id, item_type, item_name, quantity)
             self.conn.commit()
 
-    # def prepared_order(self, order_id):
-    #     prepared_time = self.current_time.time()
-    #     if order_id:
-    #         self.cursor.execute(f'UPDATE {self.table_name} SET order_prepared_hour=? WHERE id=?',
-    #                             (prepared_time, order_id))
-    #         self.conn.commit()
-    #         return True
-    #     else:
-    #         print("Error! Wrong order id!")
-    #         return False
+    def get_active_orders(self):
+        self.cursor.execute(f'''
+        SELECT 
+            o.id,
+            o.customer_id,
+            o.total_price,
+            o.order_taken_date,
+            o.order_taken_hour,
+            GROUP_CONCAT(order_details.item_name || ' (' || order_details.quantity || ')', ', ') AS items
+        FROM {self.table_name} AS o
+        JOIN order_details ON o.id = order_details.order_id
+        GROUP BY o.id, o.customer_id, o.total_price, o.order_taken_date, o.order_taken_hour''')
+        print("Active Orders")
+        return self.cursor.fetchall()
 
     def finished_order(self, order_id):
         prepared_time = self.current_time.time()
