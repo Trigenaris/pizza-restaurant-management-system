@@ -11,6 +11,8 @@ In this project; we focus on a **Restaurant Management**, specifically a made-up
 * sqlite3
 * tkinter
 * datetime
+* pandas
+* matplotlib
 * functools (for the decorator)
 * winsound (for the custom message boxes)
 
