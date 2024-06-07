@@ -1,5 +1,7 @@
 import sqlite3
 import tkinter as tk
+import pandas as pd
+import matplotlib.pyplot as plt
 from tkinter import ttk
 from tkinter import messagebox
 from tkinter import filedialog
@@ -10,7 +12,9 @@ from customers import *
 from products import *
 from orders import *
 from error_handling import *
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from custom_messageboxes import *
+from dashboard import *
 
 # Constant values
 PADX = 5
@@ -116,7 +120,7 @@ class GUI:
         notebook.add(tab1, text="Menu Management")
         notebook.add(tab2, text="Active Orders")
         notebook.add(tab3, text="Finished Orders")
-        notebook.add(tab4, text="<Placeholder>")
+        notebook.add(tab4, text="Analysis")
         notebook.pack(fill=tk.BOTH)
 
         # First tab frames
@@ -166,7 +170,6 @@ class GUI:
 
         @handle_errors
         def show_active_orders(frame):
-            global tree_active_orders
             self.cleaning_frame(frame)
             tree_active_orders = ttk.Treeview(frame, show="headings", selectmode="browse")
             tree_active_orders["columns"] = (
@@ -222,6 +225,52 @@ class GUI:
                 order_with_table = (order[0], table_no, order[2], order[3], order[4], order[5], order[6])
                 tree_finished_orders.insert("", "end", values=order_with_table)
 
+        # Analysis Widgets
+        analysis_type_label = tk.Label(left_frame4, text="Select Analysis Type:")
+        analysis_type_label.grid(row=1, column=0, padx=PADX, pady=PADY)
+
+        analysis_type_combobox = ttk.Combobox(left_frame4, values=[
+            "Sales Summary", "Sales Trend", "Customer Segments", "Customer Segments Plot"
+        ])
+        analysis_type_combobox.grid(row=1, column=1, padx=PADX, pady=PADY)
+        analysis_type_combobox.current(0)
+
+        analysis_button = ttk.Button(left_frame4, text="Show Analysis",
+                                     command=lambda: show_analysis(right_frame4, analysis_type_combobox.get()))
+        analysis_button.grid(row=2, column=1, columnspan=2, pady=10)
+
+        # Analysis Functions
+        @handle_errors
+        def show_analysis(frame, analysis_type):
+            for widget in frame.winfo_children():
+                if widget != analysis_type_label and widget != analysis_type_combobox and widget != analysis_button:
+                    widget.destroy()
+
+            sales_data = SalesData()
+
+            if analysis_type == "Sales Summary":
+                summary = sales_data.get_sales_summary()
+                text_widget = tk.Text(frame, wrap='word')
+                text_widget.pack(expand=True, fill='both')
+                text_widget.insert(tk.END, summary)
+            elif analysis_type == "Sales Trend":
+                fig = sales_data.plot_sales_trend()
+                canvas = FigureCanvasTkAgg(fig, frame)
+                canvas.draw()
+                canvas.get_tk_widget().pack(expand=True, fill='both')
+            elif analysis_type == "Customer Segments":
+                segments = sales_data.get_customer_segments()
+                text_widget = tk.Text(frame, wrap='word')
+                text_widget.pack(expand=True, fill='both')
+                text_widget.insert(tk.END, segments)
+            elif analysis_type == "Customer Segments Plot":
+                fig = sales_data.plot_customer_segments()
+                canvas = FigureCanvasTkAgg(fig, frame)
+                canvas.draw()
+                canvas.get_tk_widget().pack(expand=True, fill='both')
+
+            sales_data.close_connection()
+
         # Placing grip at the corner
         grip = ttk.Sizegrip(manager_window)
         grip.place(relx=1.0, rely=1.0, anchor="se")
@@ -275,6 +324,7 @@ class GUI:
         notebook.bind("<<NotebookTabChanged>>",
                       lambda event: show_finished_orders(right_frame3) if notebook.index("current") == 2 else None)
 
+    # Product management functions
     @handle_errors
     def add_product(self):
         add_product_window = tk.Toplevel(self.window)
@@ -507,6 +557,7 @@ class GUI:
         drinks_button = ttk.Button(left_frame1, text="Drinks", command=lambda: show_menu(right_frame1, "drinks"))
         drinks_button.grid(row=1, column=2, padx=PADX, pady=PADY)
 
+        # Order related functions
         @handle_errors
         def show_active_orders(frame):
             global tree_active_orders
@@ -889,7 +940,7 @@ class GUI:
 
         self.display_chef_logo(left_frame2)
 
-        # Second tab frames
+        # Third tab frames
         left_frame3 = ttk.Frame(tab3, width=280, height=self.display_height, relief=tk.GROOVE)
         left_frame3.pack(side="left", fill=tk.Y, expand=True, padx=PADX)
         right_frame3 = ttk.Frame(tab3, width=self.display_width, height=self.display_height, relief=tk.GROOVE)
@@ -898,6 +949,7 @@ class GUI:
 
         self.display_chef_logo(left_frame3)
 
+        # First Tab buttons
         pizzas_button = ttk.Button(left_frame1, text="Pizzas", command=lambda: show_menu(right_frame1, "pizzas"))
         pizzas_button.grid(row=1, column=1, padx=PADX, pady=PADY)
         snacks_button = ttk.Button(left_frame1, text="Snacks", command=lambda: show_menu(right_frame1, "snacks"))
@@ -905,6 +957,7 @@ class GUI:
         drinks_button = ttk.Button(left_frame1, text="Drinks", command=lambda: show_menu(right_frame1, "drinks"))
         drinks_button.grid(row=3, column=1, padx=PADX, pady=PADY)
 
+        # Order related Buttons
         @handle_errors
         def order_ready(frame):
             global tree_active_orders
@@ -1030,6 +1083,7 @@ class GUI:
         notebook.bind("<<NotebookTabChanged>>",
                       lambda event: show_finished_orders(right_frame3) if notebook.index("current") == 2 else None)
 
+    # Logo related functions
     def display_manager_logo(self, frame):
         logo_canvas = tk.Canvas(frame, width=374, height=275)
         logo_canvas.grid(row=0, column=0, columnspan=3, padx=PADX, pady=PADY * 2)
