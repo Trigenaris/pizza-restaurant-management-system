@@ -366,10 +366,13 @@ class GUI:
 
                 if product_type == "Pizza":
                     self.pizzas.add_product(product_name, product_price, product_ingredients)
+                    messagebox.showinfo(title="Success!", message=f"{product_name} is successfully added to the menu")
                 elif product_type == "Snack":
                     self.snacks.add_product(product_name, product_price, product_ingredients)
+                    messagebox.showinfo(title="Success!", message=f"{product_name} is successfully added to the menu")
                 elif product_type == "Drink":
                     self.drinks.add_product(product_name, product_price, product_ingredients)
+                    messagebox.showinfo(title="Success!", message=f"{product_name} is successfully added to the menu")
                 else:
                     messagebox.showerror(title="Error!", message="Oops! \nInvalid product type.")
 
@@ -612,7 +615,6 @@ class GUI:
             finished_orders = self.finished_orders.get_finished_orders()
             for order in finished_orders:
                 table_no = self.customers.get_table_no(order[1])
-                print(f"Inserting order: {order}")
                 order_with_table = (order[0], table_no, order[2], order[3], order[4], order[5], order[6])
                 tree_finished_orders.insert("", "end", values=order_with_table)
 
@@ -624,7 +626,7 @@ class GUI:
                 self.active_orders.cancel_order(order_id)
                 show_active_orders(frame)
             else:
-                messagebox.showwarning("Selection Error", "Please select an order to cancel.")
+                messagebox.showwarning("Selection Error!", "Please select an order to cancel.")
 
         @handle_errors
         def update_item_list(event):
@@ -965,6 +967,7 @@ class GUI:
             if selected_item:
                 order_id = tree_active_orders.item(selected_item, 'values')[0]
                 self.active_orders.finished_order(order_id)
+                messagebox.showinfo(title="Success!", message="Order successfully transferred to the finished orders.")
                 show_active_orders(frame)
             else:
                 messagebox.showwarning("Selection Error", "Please select the prepared order.")
