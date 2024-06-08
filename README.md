@@ -31,7 +31,7 @@ In this project; we focus on a **Restaurant Management**, specifically a made-up
 ### 👩‍💼 Features of the Manager:
 * Editing the menu (**Adding, updating or removing products**)
 * Checking the current, canceled, or completed orders.
-* Checking, and analyzing daily, weekly, monthly, or yearly reports. (WIP)
+* Checking, and analyzing daily, weekly, monthly, or yearly reports.
 * Detailed data analysis for the related report. (EF)
 
 ### 🤵‍♀️ Features of the Waiter: 
