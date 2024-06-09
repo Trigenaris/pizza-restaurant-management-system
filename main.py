@@ -427,21 +427,22 @@ class GUI:
             updated_price = float(product_price_entry.get())
             updated_ingredients = product_ingredients_entry.get("1.0", tk.END)
             if updated_name and updated_price:
-                if item_type == "Pizza":
-                    self.pizzas.update_product(item_id, updated_name, updated_price, updated_ingredients)
-                    tree_menu.item(selected_item, values=(item_id, updated_name, updated_price, updated_ingredients))
-                    messagebox.showinfo(title="Success!", message="Product updated successfully!")
-                    update_product_window.destroy()
-                elif item_type == "Snack":
-                    self.snacks.update_product(item_id, updated_name, updated_price, updated_ingredients)
-                    tree_menu.item(selected_item, values=(item_id, updated_name, updated_price, updated_ingredients))
-                    messagebox.showinfo(title="Success!", message="Product updated successfully!")
-                    update_product_window.destroy()
-                elif item_type == "Drink":
-                    self.drinks.update_product(item_id, updated_name, updated_price, updated_ingredients)
-                    tree_menu.item(selected_item, values=(item_id, updated_name, updated_price, updated_ingredients))
-                    messagebox.showinfo(title="Success!", message="Product updated successfully!")
-                    update_product_window.destroy()
+                if messagebox.askyesno(title="Update Product", message="Are you sure to update this product?"):
+                    if item_type == "Pizza":
+                        self.pizzas.update_product(item_id, updated_name, updated_price, updated_ingredients)
+                        tree_menu.item(selected_item, values=(item_id, updated_name, updated_price, updated_ingredients))
+                        messagebox.showinfo(title="Success!", message="Product updated successfully!")
+                        update_product_window.destroy()
+                    elif item_type == "Snack":
+                        self.snacks.update_product(item_id, updated_name, updated_price, updated_ingredients)
+                        tree_menu.item(selected_item, values=(item_id, updated_name, updated_price, updated_ingredients))
+                        messagebox.showinfo(title="Success!", message="Product updated successfully!")
+                        update_product_window.destroy()
+                    elif item_type == "Drink":
+                        self.drinks.update_product(item_id, updated_name, updated_price, updated_ingredients)
+                        tree_menu.item(selected_item, values=(item_id, updated_name, updated_price, updated_ingredients))
+                        messagebox.showinfo(title="Success!", message="Product updated successfully!")
+                        update_product_window.destroy()
             else:
                 messagebox.showwarning(title="Warning!", message="Please fill the New name and the New price.")
 
@@ -622,9 +623,10 @@ class GUI:
         def cancel_order(frame):
             selected_item = tree_active_orders.selection()
             if selected_item:
-                order_id = tree_active_orders.item(selected_item, 'values')[0]
-                self.active_orders.cancel_order(order_id)
-                show_active_orders(frame)
+                if messagebox.askyesno(title="Order Cancellation", message="Are you sure to cancel this order?"):
+                    order_id = tree_active_orders.item(selected_item, 'values')[0]
+                    self.active_orders.cancel_order(order_id)
+                    show_active_orders(frame)
             else:
                 messagebox.showwarning("Selection Error!", "Please select an order to cancel.")
 
