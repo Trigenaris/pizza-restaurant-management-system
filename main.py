@@ -230,8 +230,8 @@ class GUI:
         analysis_type_label.grid(row=1, column=0, padx=PADX, pady=PADY)
 
         analysis_type_combobox = ttk.Combobox(left_frame4, values=[
-            "Sales Summary", "Sales Trend", "Customer Segments", "Customer Segments Plot"
-        ])
+            "Sales Summary", "Daily Sales", "Weekly Sales", "Monthly Sales",
+            "Customer Segments", "Customer Segments Plot"])
         analysis_type_combobox.grid(row=1, column=1, padx=PADX, pady=PADY)
         analysis_type_combobox.current(0)
 
@@ -243,33 +243,34 @@ class GUI:
         @handle_errors
         def show_analysis(frame, analysis_type):
             for widget in frame.winfo_children():
-                if widget != analysis_type_label and widget != analysis_type_combobox and widget != analysis_button:
+                if widget not in {analysis_type_label, analysis_type_combobox, analysis_button}:
                     widget.destroy()
 
             sales_data = SalesData()
 
-            if analysis_type == "Sales Summary":
-                summary = sales_data.get_sales_summary()
-                text_widget = tk.Text(frame, wrap='word')
-                text_widget.pack(expand=True, fill='both')
-                text_widget.insert(tk.END, summary)
-            elif analysis_type == "Sales Trend":
-                fig = sales_data.plot_sales_trend()
-                canvas = FigureCanvasTkAgg(fig, frame)
-                canvas.draw()
-                canvas.get_tk_widget().pack(expand=True, fill='both')
-            elif analysis_type == "Customer Segments":
-                segments = sales_data.get_customer_segments()
-                text_widget = tk.Text(frame, wrap='word')
-                text_widget.pack(expand=True, fill='both')
-                text_widget.insert(tk.END, segments)
-            elif analysis_type == "Customer Segments Plot":
-                fig = sales_data.plot_customer_segments()
-                canvas = FigureCanvasTkAgg(fig, frame)
-                canvas.draw()
-                canvas.get_tk_widget().pack(expand=True, fill='both')
-
-            sales_data.close_connection()
+            try:
+                if analysis_type == "Sales Summary":
+                    summary = sales_data.get_sales_summary(period=analysis_type_combobox.get())
+                    text_widget = tk.Text(frame, wrap='word')
+                    text_widget.pack(expand=True, fill='both')
+                    text_widget.insert(tk.END, summary)
+                elif analysis_type in ["Daily Sales", "Weekly Sales", "Monthly Sales"]:
+                    fig = sales_data.plot_sales_trend(period=analysis_type)
+                    canvas = FigureCanvasTkAgg(fig, frame)
+                    canvas.draw()
+                    canvas.get_tk_widget().pack(expand=True, fill='both')
+                elif analysis_type == "Customer Segments":
+                    segments = sales_data.get_customer_segments()
+                    text_widget = tk.Text(frame, wrap='word')
+                    text_widget.pack(expand=True, fill='both')
+                    text_widget.insert(tk.END, segments)
+                elif analysis_type == "Customer Segments Plot":
+                    fig = sales_data.plot_customer_segments()
+                    canvas = FigureCanvasTkAgg(fig, frame)
+                    canvas.draw()
+                    canvas.get_tk_widget().pack(expand=True, fill='both')
+            finally:
+                sales_data.close_connection()
 
         # Placing grip at the corner
         grip = ttk.Sizegrip(manager_window)
@@ -1112,9 +1113,14 @@ class GUI:
 
 
 def main():
-    window = tk.Tk()
-    app = GUI(window)
-    app.window.mainloop()
+    try:
+        window = tk.Tk()
+        app = GUI(window)
+        app.window.mainloop()
+    except Exception as e:
+        print(f"Error: {e}")
+    finally:
+        app.pizzas.close_connection()
 
 
 if __name__ == "__main__":

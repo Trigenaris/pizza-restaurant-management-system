@@ -17,19 +17,26 @@ class SalesData:
             print(f"Error: {e}")
             raise
 
-    def fetch_sales_data(self):
-        query = '''
-        SELECT 
-            order_taken_date AS OrderDate,
-            SUM(total_price) AS TotalSales 
-        FROM finished_orders
-        GROUP BY order_taken_date
-        '''
-        try:
-            return pd.read_sql_query(query, self.conn)
-        except Exception as e:
-            print(f"Error: {e}")
-            return pd.DataFrame()
+    def fetch_sales_data(self, period='Daily Sales'):
+        if period == 'Daily Sales':
+            query = '''
+            SELECT order_taken_date AS OrderDate, SUM(total_price) AS TotalSales
+            FROM finished_orders
+            GROUP BY order_taken_date
+            '''
+        elif period == 'Weekly Sales':
+            query = '''
+            SELECT strftime('%Y-%W', order_taken_date) AS OrderDate, SUM(total_price) AS TotalSales
+            FROM finished_orders
+            GROUP BY strftime('%Y-%W', order_taken_date)
+            '''
+        elif period == 'Monthly Sales':
+            query = '''
+            SELECT strftime('%Y-%m', order_taken_date) AS OrderDate, SUM(total_price) AS TotalSales
+            FROM finished_orders
+            GROUP BY strftime('%Y-%m', order_taken_date)
+            '''
+        return pd.read_sql_query(query, self.conn)
 
     def fetch_customer_segment_data(self):
         query = '''
@@ -53,25 +60,30 @@ class SalesData:
         print("Database connection closed")
 
     @handle_errors
-    def get_sales_summary(self):
-        data = self.fetch_sales_data()
+    def get_sales_summary(self, period):
+        data = self.fetch_sales_data(period=period)
         if data.empty:
             return "No sales data available"
         summary = data.describe().to_string()
         return f"Sales Summary:\n{summary}"
 
     @handle_errors
-    def plot_sales_trend(self):
-        data = self.fetch_sales_data()
+    def plot_sales_trend(self, period):
+        data = self.fetch_sales_data(period=period)
         if data.empty:
             fig, ax = plt.subplots()
             ax.text(0.5, 0.5, "No sales data available", ha='center', va='center', fontsize=12)
             return fig
-        data['OrderDate'] = pd.to_datetime(data['OrderDate'])
+        if period == 'Daily Sales':
+            data['OrderDate'] = pd.to_datetime(data['OrderDate'])
+        elif period == 'Weekly Sales':
+            data['OrderDate'] = pd.to_datetime(data['OrderDate'] + '-0', format='%Y-%W-%w')
+        elif period == 'Monthly Sales':
+            data['OrderDate'] = pd.to_datetime(data['OrderDate'] + '-01')
         data = data.sort_values('OrderDate')
         fig, ax = plt.subplots()
         ax.plot(data['OrderDate'], data['TotalSales'])
-        ax.set_title('Sales Trend')
+        ax.set_title(f'{period} Trend')
         ax.set_xlabel('Order Date')
         ax.set_ylabel('Total Sales')
         return fig
