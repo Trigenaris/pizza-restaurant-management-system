@@ -5,12 +5,22 @@ from products import *
 
 
 class OrderDetails:
+    """
+    Class representing the order details of a restaurant.
+    """
     def __init__(self):
+        """
+        Initialize an order details instance.
+        """
         self.conn = sqlite3.connect("pizza_restaurant.db")
         self.cursor = self.conn.cursor()
         self.create_table()
 
     def create_table(self):
+        """
+        Creates necessary tables if they do not exist yet.
+        :return: None
+        """
         self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS order_details (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -26,10 +36,20 @@ class OrderDetails:
         ''')
 
     def add_order_details(self, order_id, item_type, item_id, item_name, quantity):
+        """
+        Adds the order details to which refers to the current order_id parameter.
+        :param order_id: id of the order that is referenced from Orders class.
+        :param item_type: item type of the product that is referenced from Product class.
+        :param item_id: id of the product that is referenced from Product class.
+        :param item_name: name of the product that is referenced from Product class.
+        :param quantity: quantity of the ordered product.
+        :return: None
+        """
         self.cursor.execute('INSERT INTO order_details (order_id, item_id, item_type, item_name, quantity) VALUES (?,?,?,?,?)',
                             (order_id, item_type, item_id, item_name, quantity))
         self.conn.commit()
 
+    # For now, this function is obsolete
     def get_order_items(self, order_id):
         self.cursor.execute('''SELECT 
                                 o.id,
@@ -47,7 +67,14 @@ class OrderDetails:
 
 
 class Orders:
+    """
+    Class representing the orders of a restaurant.
+    """
     def __init__(self, table_name):
+        """
+        Initialize an orders instance.
+        :param table_name (str): The table name which inherits from the orders instance
+        """
         self.table_name = table_name
         self.conn = sqlite3.connect("pizza_restaurant.db")
         self.cursor = self.conn.cursor()
@@ -57,6 +84,10 @@ class Orders:
 
     # Main order table
     def create_table(self):
+        """
+        Creates necessary tables if they do not exist yet.
+        :return: None
+        """
         self.cursor.execute(f'''
             CREATE TABLE IF NOT EXISTS {self.table_name} (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -73,7 +104,15 @@ class Orders:
         self.conn.commit()
 
     def take_order(self, customer_type, customer_id, items, total_price):
-        total_price = 0
+        """
+        Takes an order information given from the customer and insert the data to the related table.
+        :param customer_type: (int) Type of the customer. (0 is temp_customer and 1 is perm_customer.)
+        :param customer_id: (id) id of the customer.
+        :param items: (iterable) Ordered items
+        :param total_price: (float) Total price of the order. (Currently obsolete parameter)
+        :return: None
+        """
+        total_price = 0  # Currently total_price is defined in the function with a default 0 value.
         current_date = datetime.now().strftime('%Y-%m-%d')
         current_time = datetime.now().strftime('%H:%M:%S')
         if customer_type == 0:  # temp_customers
@@ -93,7 +132,8 @@ class Orders:
                 item_id, item_type, item_name, item_price, quantity = item
                 item_name = self.get_product_name(item_type, item_id)
                 self.order_details.add_order_details(order_id, item_id, item_type, item_name, quantity)
-        else:
+
+        else:  # perm_customers
             for item in items:
                 item_id, item_type, item_name, item_price, quantity = item
                 price = self.get_product_price(item_type, item_id)
@@ -113,6 +153,10 @@ class Orders:
             self.conn.commit()
 
     def get_active_orders(self):
+        """
+        Returns the orders and the details of the orders via a new query (order_details is used in the query with JOIN)
+        :return: All the data which responds to the query.
+        """
         self.cursor.execute(f'''
         SELECT 
             o.id,
@@ -128,6 +172,10 @@ class Orders:
         return self.cursor.fetchall()
 
     def get_finished_orders(self):
+        """
+        Returns the orders and the details of the orders via a new query (order_details is used in the query with JOIN)
+        :return: All the data which responds to the query.
+        """
         self.cursor.execute(f'''
         SELECT 
             o.id,
@@ -144,29 +192,58 @@ class Orders:
         return self.cursor.fetchall()
 
     def cancel_order(self, order_id):
+        """
+        Cancels and removes the selected order from the database.
+        :param order_id: id of the order.
+        :return: None
+        """
         self.cursor.execute(f"DELETE FROM order_details WHERE order_id = ?", (order_id,))
         self.cursor.execute(f"DELETE FROM {self.table_name} WHERE id = ?", (order_id,))
         self.conn.commit()
 
     def get_product_price(self, item_type, product_id):
+        """
+        Gets and returns the price of the product which has the same product_id.
+        :param item_type: (int) Type of the product.
+        :param product_id: (int) id of the product.
+        :return: (float) Price of the product.
+        """
         table_name = 'pizzas' if item_type == 0 else 'snacks' if item_type == 1 else 'drinks'
         price = self.cursor.execute(f'SELECT price FROM {table_name} WHERE id=?', (product_id,)).fetchone()
         return price[0] if price else 0
 
     def get_product_name(self, item_type, product_id):
+        """
+        Gets and returns the name of the product which has the same product_id.
+        :param item_type: (int) Type of the product.
+        :param product_id: (int) id of the product.
+        :return: (str) Name of the product.
+        """
         table_name = 'pizzas' if item_type == 0 else 'snacks' if item_type == 1 else 'drinks'
         name = self.cursor.execute(f'SELECT name FROM {table_name} WHERE id=?', (product_id,)).fetchone()
         return name[0] if name else 0
 
+    # For now, this function is obsolete
     def get_order_details(self, order_id):
         return self.order_details.get_order_items(order_id)
 
 
 class ActiveOrders(Orders):
+    """
+    Class representing an active order which also inherits from the Orders class.
+    """
     def __init__(self):
+        """
+        Initialize an active order instance.
+        """
         super().__init__('active_orders')
 
     def finished_order(self, order_id):
+        """
+        Transfers an active order to the finished orders table and deletes it from the active orders table.
+        :param order_id: (int) id of the order
+        :return: Boolean
+        """
         prepared_time = datetime.now().strftime('%H:%M:%S')
         if order_id:
             try:
@@ -188,10 +265,17 @@ class ActiveOrders(Orders):
 
 
 class FinishedOrders(Orders):
+    """
+    Class representing a finished order which also inherits from the Orders class.
+    """
     def __init__(self):
+        """
+        Initialize a finished order instance.
+        """
         super().__init__('finished_orders')
 
 
+# Obsolete subclass of the Orders class
 class CanceledOrders(Orders):
     def __init__(self):
         super().__init__('canceled_orders')
