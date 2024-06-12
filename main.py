@@ -26,7 +26,14 @@ total_price = 0
 
 
 class GUI:
+    """
+    Class representing the main GUI of a restaurant management system.
+    """
     def __init__(self, window):
+        """
+        Initializes a GUI instance.
+        :param window: (obj) Expects a tkinter window instance
+        """
         # main window setup
         self.window = window
         self.window.title("Crazy Pizza Restaurant Management System")
@@ -88,6 +95,10 @@ class GUI:
         self.items = []
 
     def login_process(self):
+        """
+        Manages the login process for the related role in the menu (Manager, Waiter, Chef)
+        :return: None
+        """
         user = self.user_string.get()
         password = self.password_string.get()
         if user == "Manager" and password == self.password:
@@ -101,6 +112,10 @@ class GUI:
             # messagebox.showerror(title="Error!", message="Oops! \nInvalid username or password.")
 
     def manager_menu(self):
+        """
+        Creates a Toplevel window for the manager role
+        :return: None
+        """
         # Manager Window Setup
         manager_window = tk.Toplevel(self.window)
         manager_window.title("Crazy Pizza Management")
@@ -170,6 +185,11 @@ class GUI:
 
         @handle_errors
         def show_active_orders(frame):
+            """
+            Shows the active orders at the moment on a frame that is provided from the parameter.
+            :param frame: (obj) Expects a tkinter frame object.
+            :return: None
+            """
             self.cleaning_frame(frame)
             tree_active_orders = ttk.Treeview(frame, show="headings", selectmode="browse")
             tree_active_orders["columns"] = (
@@ -198,6 +218,11 @@ class GUI:
 
         @handle_errors
         def show_finished_orders(frame):
+            """
+            Shows the finished orders at the moment on a frame that is provided from the parameter.
+            :param frame: (obj) Expects a tkinter frame object.
+            :return: None
+            """
             self.cleaning_frame(frame)
             tree_finished_orders = ttk.Treeview(frame, show="headings", selectmode="browse")
             tree_finished_orders["columns"] = (
@@ -242,6 +267,13 @@ class GUI:
         # Analysis Functions
         @handle_errors
         def show_analysis(frame, analysis_type):
+            """
+            Shows the related graph on the provided frame as a parameter.
+            :param frame: (obj) Expects a tkinter frame instance.
+            :param analysis_type: (str) Expects the type of the analysis as a string. Which is provided in the rest of
+            the function.
+            :return: None
+            """
             for widget in frame.winfo_children():
                 if widget not in {analysis_type_label, analysis_type_combobox, analysis_button}:
                     widget.destroy()
@@ -278,6 +310,11 @@ class GUI:
 
         @handle_errors
         def show_menu(frame):
+            """
+            Shows the current products in a frame.
+            :param frame: (obj) Expects a tkinter frame instance
+            :return: None
+            """
             self.cleaning_frame(frame)
             self.tree_menu = ttk.Treeview(frame, show="headings", selectmode="browse")
             self.tree_menu["columns"] = ("ID", "Type", "Name", "Price", "Ingredients")
@@ -328,6 +365,10 @@ class GUI:
     # Product management functions
     @handle_errors
     def add_product(self):
+        """
+        Creates a Toplevel window instance that contains related widgets to add a product in the database.
+        :return: None
+        """
         add_product_window = tk.Toplevel(self.window)
         add_product_window.title("New Product")
         add_product_window.geometry("500x400")
@@ -358,6 +399,10 @@ class GUI:
 
         @handle_errors
         def adding_product():
+            """
+            Adds the provided information into the related product table.
+            :return: None
+            """
             product_type = product_string.get()
             product_name = product_name_entry.get()
             product_price = float(product_price_entry.get())
@@ -385,6 +430,11 @@ class GUI:
 
     @handle_errors
     def update_product(self, tree_menu):
+        """
+        Creates a Toplevel window instance that contains related widgets to update a product in the database.
+        :param tree_menu: (obj) Expects a selection from a tree menu
+        :return: None
+        """
         selected_item = tree_menu.selection()
         if not selected_item:
             messagebox.showwarning(title="Warning!", message="You haven't selected any product from the menu.")
@@ -399,9 +449,7 @@ class GUI:
         item_id = item_values[0]
         item_type = item_values[1]
         old_name = item_values[2]
-        print(f"old name: {old_name}")
         old_price = item_values[3]
-        print(f"old price: {old_price}")
         old_ingredients = item_values[4]
 
         product_name_label = ttk.Label(update_product_window, text="New Product Name: ")
@@ -424,6 +472,10 @@ class GUI:
 
         @handle_errors
         def updating_product():
+            """
+            Updates the provided information of the related product.
+            :return: None
+            """
             updated_name = product_name_entry.get()
             updated_price = float(product_price_entry.get())
             updated_ingredients = product_ingredients_entry.get("1.0", tk.END)
@@ -452,6 +504,11 @@ class GUI:
 
     @handle_errors
     def remove_product(self, tree_menu):
+        """
+        Creates a Toplevel window instance that contains related widgets to remove a product from the database.
+        :param tree_menu: (obj) Expects a selection from a tree menu
+        :return: None
+        """
         selected_item = tree_menu.selection()
         if not selected_item:
             messagebox.showwarning(title="Warning!", message="You haven't selected any product from the menu.")
@@ -479,6 +536,10 @@ class GUI:
 
         @handle_errors
         def removing_product():
+            """
+            Removes the related product from the database.
+            :return: None
+            """
             if messagebox.askyesno(title="Remove Product", message="Are you sure to remove this product?"):
                 if item_type == "Pizza":
                     self.pizzas.remove_product(item_id)
@@ -500,10 +561,19 @@ class GUI:
         cancel_button.grid(row=1, column=1, padx=PADX, pady=PADY*2)
 
     def cleaning_frame(self, frame):
+        """
+        Removes the every widget which are connected to the provided frame as a parameter.
+        :param frame: (obj) Expects a frame instance to remove widgets in it.
+        :return: None
+        """
         for widget in frame.winfo_children():
             widget.destroy()
 
     def waiter_menu(self):
+        """
+        Creates a Toplevel window for the waiter role
+        :return: None
+        """
         # Waiter Window Setup
         waiter_window = tk.Toplevel(self.window)
         waiter_window.title("Crazy Pizza Order Services")
@@ -565,6 +635,11 @@ class GUI:
         # Order related functions
         @handle_errors
         def show_active_orders(frame):
+            """
+            Shows the active orders at the moment on a frame that is provided from the parameter.
+            :param frame: (obj) Expects a tkinter frame object.
+            :return: None
+            """
             global tree_active_orders
             self.cleaning_frame(frame)
             tree_active_orders = ttk.Treeview(frame, show="headings", selectmode="browse")
@@ -594,6 +669,11 @@ class GUI:
 
         @handle_errors
         def show_finished_orders(frame):
+            """
+            Shows the finished orders at the moment on a frame that is provided from the parameter.
+            :param frame: (obj) Expects a tkinter frame object.
+            :return: None
+            """
             self.cleaning_frame(frame)
             tree_finished_orders = ttk.Treeview(frame, show="headings", selectmode="browse")
             tree_finished_orders["columns"] = (
@@ -622,6 +702,11 @@ class GUI:
 
         @handle_errors
         def cancel_order(frame):
+            """
+            Cancels an order which is selected from a frame.
+            :param frame: (obj) Expects a frame instance.
+            :return: None
+            """
             selected_item = tree_active_orders.selection()
             if selected_item:
                 if messagebox.askyesno(title="Order Cancellation", message="Are you sure to cancel this order?"):
@@ -633,6 +718,11 @@ class GUI:
 
         @handle_errors
         def update_item_list(event):
+            """
+            Refreshes the menu frame as the combobox selection changes.
+            :param event: None (Needed for the bind method of tkinter)
+            :return: None
+            """
             selected_item_type = item_type_combobox.get()
             if selected_item_type == "Pizza":
                 items = self.pizza.list_products()
@@ -644,8 +734,12 @@ class GUI:
 
         @handle_errors
         def show_product_details(event):
+            """
+            Assigns the attributes of the selected product to other variables.
+            :param event: None (Needed for the bind method of tkinter)
+            :return: None
+            """
             selected_item_name = item_combobox.get()
-            print(selected_item_name)
             selected_item_type = item_type_combobox.get()
             if selected_item_type == "Pizza":
                 product_attributes = self.pizza.select_product(selected_item_name)
@@ -659,8 +753,11 @@ class GUI:
 
         @handle_errors
         def get_order_details():
+            """
+            Assigns the product details and returns it as a tuple.
+            :return: (tuple) item_details
+            """
             selected_item_name = item_combobox.get()
-            print(selected_item_name)
             selected_item_type = item_type_combobox.get()
             if selected_item_type == "Pizza":
                 product_attributes = self.pizza.select_product(selected_item_name)
@@ -682,6 +779,10 @@ class GUI:
         # Adding selected item to the current order
         @handle_errors
         def add_to_order():
+            """
+            Collects the related data to add them in an order.
+            :return: None
+            """
             global total_price
             item_details = get_order_details()
             if item_details:
@@ -699,6 +800,10 @@ class GUI:
 
         @handle_errors
         def refresh_labels():
+            """
+            Resets the total price and the total ordered products labels.
+            :return: None
+            """
             total_price_amount_label.config(text="")
             total_orders_name_label.config(text="")
             self.items = []
@@ -707,15 +812,31 @@ class GUI:
         # New window for submitting an order
         @handle_errors
         def completing_order():
+            """
+            Starts an order completion process via Toplevel window with widgets and nested functions.
+            :return: None
+            """
             def show_temp_customer_frame():
+                """
+                Grids the temporary customer frame and removes the permanent customer frame.
+                :return: None
+                """
                 temp_customer_frame.grid(row=1, column=0, columnspan=2, padx=10, pady=10)
                 perm_customer_frame.grid_forget()
 
             def show_perm_customer_frame():
+                """
+                Grids the permanent customer frame and removes the temporary customer frame.
+                :return: None
+                """
                 perm_customer_frame.grid(row=1, column=0, columnspan=2, padx=10, pady=10)
                 temp_customer_frame.grid_forget()
 
             def submit_order():
+                """
+                Collects the customer information and order information and calls related SQL functions.
+                :return: None
+                """
                 customer_type = customer_type_var.get()
                 customer_id = None
                 total_float_price = (total_price_amount_label.cget('text'))
@@ -856,6 +977,12 @@ class GUI:
 
         @handle_errors
         def show_menu(frame, item_type):
+            """
+            Shows the products of provided item type in a frame.
+            :param frame: (obj) Expects a tkinter frame instance
+            :param item_type: (str) Expects a string
+            :return: None
+            """
             self.cleaning_frame(frame)
             self.tree_menu = ttk.Treeview(frame, show="headings", selectmode="browse")
             self.tree_menu["columns"] = ("ID", "Type", "Name", "Price", "Ingredients")
@@ -907,6 +1034,10 @@ class GUI:
                       lambda event: show_finished_orders(right_frame3) if notebook.index("current") == 2 else None)
 
     def chef_menu(self):
+        """
+        Creates a Toplevel window for the manager role
+        :return: None
+        """
         # Chef Window Setup
         chef_window = tk.Toplevel(self.window)
         chef_window.title("Crazy Pizza Cooking Services")
@@ -965,6 +1096,11 @@ class GUI:
         # Order related Buttons
         @handle_errors
         def order_ready(frame):
+            """
+            Transfers the selected order from active orders to finished orders.
+            :param frame: (obj) Expects a tkinter frame instance as a selection.
+            :return: None
+            """
             global tree_active_orders
             selected_item = tree_active_orders.selection()
             if selected_item:
@@ -977,6 +1113,11 @@ class GUI:
 
         @handle_errors
         def show_active_orders(frame):
+            """
+            Shows the active orders at the moment on a frame that is provided from the parameter.
+            :param frame: (obj) Expects a tkinter frame object.
+            :return: None
+            """
             global tree_active_orders
             self.cleaning_frame(frame)
             tree_active_orders = ttk.Treeview(frame, show="headings", selectmode="browse")
@@ -1006,6 +1147,11 @@ class GUI:
 
         @handle_errors
         def show_finished_orders(frame):
+            """
+            Shows the finished orders at the moment on a frame that is provided from the parameter.
+            :param frame: (obj) Expects a tkinter frame object.
+            :return: None
+            """
             self.cleaning_frame(frame)
             tree_finished_orders = ttk.Treeview(frame, show="headings", selectmode="browse")
             tree_finished_orders["columns"] = (
@@ -1039,6 +1185,12 @@ class GUI:
 
         @handle_errors
         def show_menu(frame, item_type):
+            """
+            Shows the products of provided item type in a frame.
+            :param frame: (obj) Expects a tkinter frame instance
+            :param item_type: (str) Expects a string
+            :return: None
+            """
             self.cleaning_frame(frame)
             self.tree_menu = ttk.Treeview(frame, show="headings", selectmode="browse")
             self.tree_menu["columns"] = ("ID", "Type", "Name", "Price", "Ingredients")
@@ -1091,6 +1243,11 @@ class GUI:
 
     # Logo related functions
     def display_manager_logo(self, frame):
+        """
+        Displays the manager png logo in a frame
+        :param frame: (obj) Expects a tkinter frame instance
+        :return: None
+        """
         logo_canvas = tk.Canvas(frame, width=374, height=275)
         logo_canvas.grid(row=0, column=0, columnspan=3, padx=PADX, pady=PADY * 2)
         manager_image = tk.PhotoImage(file="crazy_manager_logo.png")
@@ -1098,6 +1255,11 @@ class GUI:
         self.manager_images.append(manager_image)
 
     def display_waiter_logo(self, frame):
+        """
+        Displays the waiter png logo in a frame
+        :param frame: (obj) Expects a tkinter frame instance
+        :return: None
+        """
         logo_canvas = tk.Canvas(frame, width=374, height=275)
         logo_canvas.grid(row=0, column=0, columnspan=3, padx=PADX, pady=PADY * 2)
         waiter_image = tk.PhotoImage(file="crazy_waiter_logo.png")
@@ -1105,6 +1267,11 @@ class GUI:
         self.waiter_images.append(waiter_image)
 
     def display_chef_logo(self, frame):
+        """
+        Displays the chef png logo in a frame
+        :param frame: (obj) Expects a tkinter frame instance
+        :return: None
+        """
         logo_canvas = tk.Canvas(frame, width=374, height=275)
         logo_canvas.grid(row=0, column=0, columnspan=3, padx=PADX, pady=PADY * 2)
         chef_image = tk.PhotoImage(file="crazy_chef_logo.png")
