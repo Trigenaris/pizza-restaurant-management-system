@@ -83,6 +83,27 @@ After logging in, the related menu appears on the screen. (Manager menu for exam
 ![pizza4](https://github.com/Trigenaris/pizza-restaurant-management-system/assets/122381599/e6125be6-74e8-4c82-acdd-d04866f4015b)
 ![pizza5](https://github.com/Trigenaris/pizza-restaurant-management-system/assets/122381599/f63bbd66-1a57-419c-9a5d-31cd49e00404)
 
+## Remove Product
+
+* 1️⃣ The user selects a product from the menu,
+* 2️⃣ Clicks `Remove Product` button,
+* 3️⃣ The application asks again to the user to be sure about the process,
+* 4️⃣ The selected product is deleted from the menu and the database!
+
+![pizza6](https://github.com/Trigenaris/pizza-restaurant-management-system/assets/122381599/2a5dc2ad-ca7d-4d31-83e6-5013e2445147)
+![pizza7](https://github.com/Trigenaris/pizza-restaurant-management-system/assets/122381599/eddbe8ca-944f-418f-a36b-6583d53ddd96)
+
+## Update Product
+
+* 1️⃣ The user selects a product from the menu,
+* 2️⃣ Clicks the `Update Product` button,
+* 3️⃣ Enters new information about the product,
+* 4️⃣ Clicks the `Update Product` button in the new window,
+* 5️⃣ The application asks again to the user to be sure about the process,
+* 6️⃣ The selected product is updated in the menu and the database!
+
+![pizza8](https://github.com/Trigenaris/pizza-restaurant-management-system/assets/122381599/1932840f-ae27-44a1-8648-88729fe1c227)
+![pizza9](https://github.com/Trigenaris/pizza-restaurant-management-system/assets/122381599/dc6ad490-0744-4a3d-b0ed-eaa70ba832be)
 
 
 
