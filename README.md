@@ -46,10 +46,6 @@ In this project; we focus on a **Restaurant Management**, specifically a made-up
 
 <hr>
 
-The project will have notices as it progresses in the future.
-
-<hr>
-
 <h2>
     How Does It Work?
 </h2>
@@ -117,11 +113,69 @@ The waiter can check the menu whenever he/she chooses **the product type** from 
 
 ## Take Order
 
-* Firstly, the user chooses **the product type**.
-* Then, chooses **product name**.
-* After that, chooses **the quantity** of the current product.
-* Lastly, the user clicks `Add to Order` button to see the total order and the total price.
+* 1️⃣ Firstly, the user chooses **the product type**.
+* 2️⃣ Then, chooses **product name**.
+* 3️⃣ After that, chooses **the quantity** of the current product.
+* 4️⃣ Lastly, the user clicks `Add to Order` button to see the total order and the total price.
 
 ![pizza11](https://github.com/Trigenaris/pizza-restaurant-management-system/assets/122381599/84725f14-0eda-4196-831e-8a4c7b9e6eba)
 
-* When the order is finished, 
+* 5️⃣ When the order is ready to complete, the user clicks `Complete Order` button.
+* 6️⃣ Then, the user chooses customer type,
+* 7️⃣ And writes down the customer information.
+* 8️⃣Finally the user clicks `Submit Order` button to add the order in **the active orders** tab and the database.
+
+![pizza12](https://github.com/Trigenaris/pizza-restaurant-management-system/assets/122381599/4ff303c8-e425-4f11-ac0a-9fb2d9801ba3)
+
+## Active Orders
+
+Whenever the user clicks `Show Active Orders` button in the **Active Orders** tab, he/she can see the details of the orders which are currently active.
+
+![pizza13](https://github.com/Trigenaris/pizza-restaurant-management-system/assets/122381599/1f4b5e34-f2b9-4dd1-b225-867aeb07779e)
+
+<hr>
+
+# Chef Menu
+
+Like the waiter, chef also can check the whole menu;
+
+![pizza14](https://github.com/Trigenaris/pizza-restaurant-management-system/assets/122381599/21536f35-7a4d-4590-8775-e9f85fbb8fe5)
+
+## Preparing Order
+
+Chef's specific function in the menu is finishing active orders.
+
+* 1️⃣ Firstly, the user selects one of the active orders,
+* 2️⃣ Then clicks `Order Ready` button,
+* 3️⃣ And an information window appears as the message says that the order is transferred from the active order to finished order. (Both in GUI and in the database)
+
+![pizza15](https://github.com/Trigenaris/pizza-restaurant-management-system/assets/122381599/98810c8f-7136-4a7f-9fa2-c21c366944ee)
+
+## Finished Orders
+
+* 1️⃣ The user clicks `Finished Orders` tab.
+* 2️⃣ Then clicks `Show Finished Orders` button.
+* 3️⃣ And the finished orders appears on the right frame with their details. (Prepared hour is also added to the finished orders.)
+
+<hr>
+
+# Manager Menu (Analysis)
+
+Let's get back to the manager menu for the analysis feature:
+
+Oops! Looks like the user entered an invalid password!
+
+![pizza17](https://github.com/Trigenaris/pizza-restaurant-management-system/assets/122381599/4c36af06-ab38-4d8b-9fdd-83af927cf06f)
+
+## Analysis
+
+The related graph appears on the right frame as the user selects the anaylsis type and clicks `Show Analysis` button:
+
+![pizza18](https://github.com/Trigenaris/pizza-restaurant-management-system/assets/122381599/ea4fb325-6624-45c8-a57d-76c6998177e2)
+![pizza19](https://github.com/Trigenaris/pizza-restaurant-management-system/assets/122381599/2731ee05-3375-4ee6-bcf6-5ddc568c39af)
+
+<hr>
+
+The project will have notices as it progresses in the future.
+
+<hr>
