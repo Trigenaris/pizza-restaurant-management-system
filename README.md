@@ -105,5 +105,23 @@ After logging in, the related menu appears on the screen. (Manager menu for exam
 ![pizza8](https://github.com/Trigenaris/pizza-restaurant-management-system/assets/122381599/1932840f-ae27-44a1-8648-88729fe1c227)
 ![pizza9](https://github.com/Trigenaris/pizza-restaurant-management-system/assets/122381599/dc6ad490-0744-4a3d-b0ed-eaa70ba832be)
 
+<hr>
 
+# Waiter Menu
 
+When the user logs in as the **waiter**, another window appears with the same layout but different buttons and tabs.
+
+The waiter can check the menu whenever he/she chooses **the product type** from the left frame:
+
+![pizza10](https://github.com/Trigenaris/pizza-restaurant-management-system/assets/122381599/ab2fae54-f4b7-4070-a781-8671fbf91d8f)
+
+## Take Order
+
+* Firstly, the user chooses **the product type**.
+* Then, chooses **product name**.
+* After that, chooses **the quantity** of the current product.
+* Lastly, the user clicks `Add to Order` button to see the total order and the total price.
+
+![pizza11](https://github.com/Trigenaris/pizza-restaurant-management-system/assets/122381599/84725f14-0eda-4196-831e-8a4c7b9e6eba)
+
+* When the order is finished, 
