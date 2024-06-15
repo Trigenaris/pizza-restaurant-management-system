@@ -109,7 +109,6 @@ class GUI:
             self.chef_menu()
         else:
             custom_showerror(self.window, title="Error!", message="Oops! \nInvalid username or password.")
-            # messagebox.showerror(title="Error!", message="Oops! \nInvalid username or password.")
 
     def manager_menu(self):
         """
@@ -412,18 +411,28 @@ class GUI:
 
                 if product_type == "Pizza":
                     self.pizzas.add_product(product_name, product_price, product_ingredients)
-                    messagebox.showinfo(title="Success!", message=f"{product_name} is successfully added to the menu")
+                    custom_showinfo(add_product_window, title="Success!",
+                                    message=f"{product_name} is successfully \nadded to the menu")
+                    # messagebox.showinfo(title="Success!", message=f"{product_name} is successfully added to the menu")
                 elif product_type == "Snack":
                     self.snacks.add_product(product_name, product_price, product_ingredients)
-                    messagebox.showinfo(title="Success!", message=f"{product_name} is successfully added to the menu")
+                    custom_showinfo(add_product_window, title="Success!",
+                                    message=f"{product_name} is successfully \nadded to the menu")
+                    # messagebox.showinfo(title="Success!", message=f"{product_name} is successfully added to the menu")
                 elif product_type == "Drink":
                     self.drinks.add_product(product_name, product_price, product_ingredients)
-                    messagebox.showinfo(title="Success!", message=f"{product_name} is successfully added to the menu")
+                    custom_showinfo(add_product_window, title="Success!",
+                                    message=f"{product_name} is successfully \nadded to the menu")
+                    # messagebox.showinfo(title="Success!", message=f"{product_name} is successfully added to the menu")
                 else:
-                    messagebox.showerror(title="Error!", message="Oops! \nInvalid product type.")
+                    custom_showerror(add_product_window, title="Error!", message="Oops! \nInvalid product type.")
+                    # messagebox.showerror(title="Error!", message="Oops! \nInvalid product type.")
 
             else:
-                messagebox.showwarning(title="Warning!", message="Please fill the Product Name and the Product Price.")
+                custom_showerror(add_product_window, title="Warning!",
+                                 message="Please fill the Product Name \nand the Product Price.")
+                # messagebox.showwarning(title="Warning!",
+                # message="Please fill the Product Name and the Product Price.")
 
         adding_product_button = ttk.Button(add_product_window, text="Add Product", command=adding_product)
         adding_product_button.grid(row=4, column=0, columnspan=2, pady=PADY)
