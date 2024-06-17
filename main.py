@@ -490,23 +490,33 @@ class GUI:
             updated_ingredients = product_ingredients_entry.get("1.0", tk.END)
             if updated_name and updated_price:
                 if messagebox.askyesno(title="Update Product", message="Are you sure to update this product?"):
+                # if custom_askyesno(parent=update_product_window, title="Update Product",
+                #                    message="Are you sure \nto update this product?"):
+
                     if item_type == "Pizza":
                         self.pizzas.update_product(item_id, updated_name, updated_price, updated_ingredients)
                         tree_menu.item(selected_item, values=(item_id, updated_name, updated_price, updated_ingredients))
-                        messagebox.showinfo(title="Success!", message="Product updated successfully!")
+                        # messagebox.showinfo(title="Success!", message="Product updated successfully!")
+                        custom_showinfo(parent=update_product_window, title="Success!",
+                                        message="Product updated successfully!")
                         update_product_window.destroy()
                     elif item_type == "Snack":
                         self.snacks.update_product(item_id, updated_name, updated_price, updated_ingredients)
                         tree_menu.item(selected_item, values=(item_id, updated_name, updated_price, updated_ingredients))
-                        messagebox.showinfo(title="Success!", message="Product updated successfully!")
+                        # messagebox.showinfo(title="Success!", message="Product updated successfully!")
+                        custom_showinfo(parent=update_product_window, title="Success!",
+                                        message="Product updated successfully!")
                         update_product_window.destroy()
                     elif item_type == "Drink":
                         self.drinks.update_product(item_id, updated_name, updated_price, updated_ingredients)
                         tree_menu.item(selected_item, values=(item_id, updated_name, updated_price, updated_ingredients))
-                        messagebox.showinfo(title="Success!", message="Product updated successfully!")
+                        # messagebox.showinfo(title="Success!", message="Product updated successfully!")
+                        custom_showinfo(parent=update_product_window, title="Success!",
+                                        message="Product updated successfully!")
                         update_product_window.destroy()
             else:
-                messagebox.showwarning(title="Warning!", message="Please fill the New name and the New price.")
+                # messagebox.showwarning(title="Warning!", message="Please fill the New name and the New price.")
+                custom_showerror(title="Warning!", message="Please fill the New name and the New price.")
 
         updating_product_button = ttk.Button(update_product_window, text="Update Product", command=updating_product)
         updating_product_button.grid(row=4, column=0, columnspan=2, pady=PADY)
@@ -550,17 +560,25 @@ class GUI:
             :return: None
             """
             if messagebox.askyesno(title="Remove Product", message="Are you sure to remove this product?"):
+            # if custom_askyesno(parent=remove_product_window, title="Remove Product",
+            #                    message="Are you sure \nto remove this product?"):
                 if item_type == "Pizza":
                     self.pizzas.remove_product(item_id)
-                    messagebox.showinfo(title="Success!", message="Product removed successfully!")
+                    # messagebox.showinfo(title="Success!", message="Product removed successfully!")
+                    custom_showinfo(parent=remove_product_window, title="Success!",
+                                    message="Product removed successfully!")
                     remove_product_window.destroy()
                 elif item_type == "Snack":
                     self.snacks.remove_product(item_id)
-                    messagebox.showinfo(title="Success!", message="Product removed successfully!")
+                    # messagebox.showinfo(title="Success!", message="Product removed successfully!")
+                    custom_showinfo(parent=remove_product_window, title="Success!",
+                                    message="Product removed successfully!")
                     remove_product_window.destroy()
                 elif item_type == "Drink":
                     self.drinks.remove_product(item_id)
-                    messagebox.showinfo(title="Success!", message="Product removed successfully!")
+                    # messagebox.showinfo(title="Success!", message="Product removed successfully!")
+                    custom_showinfo(parent=remove_product_window, title="Success!",
+                                    message="Product removed successfully!")
                     remove_product_window.destroy()
 
         remove_product_button = ttk.Button(remove_product_window, text="Remove Product", command=removing_product)

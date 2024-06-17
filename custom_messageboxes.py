@@ -42,9 +42,9 @@ class CustomShowInfo(CustomMessageBoxes):
         super().__init__(parent, title, message)
 
         image = tk.PhotoImage(file="crazy_showinfo_logo.png")
-        error_label = ttk.Label(self, image=image)
-        error_label.image = image
-        error_label.grid(row=0, column=0, pady=15)
+        info_label = ttk.Label(self, image=image)
+        info_label.image = image
+        info_label.grid(row=0, column=0, pady=15)
 
         message_label = ttk.Label(self, text=message)
         message_label.grid(row=0, column=1, padx=15, pady=15)
@@ -55,9 +55,42 @@ class CustomShowInfo(CustomMessageBoxes):
         self.wait_window(self)
 
 
+class CustomAskyesno(CustomMessageBoxes):
+    def __init__(self, parent, title, message):
+        super().__init__(parent, title, message)
+
+        def yes_func():
+            self.destroy()
+            return True
+
+        def no_func():
+            self.destroy()
+            return False
+
+        image = tk.PhotoImage(file="crazy_askyesno_logo.png")
+        error_label = ttk.Label(self, image=image)
+        error_label.image = image
+        error_label.grid(row=0, column=0, pady=15)
+
+        message_label = ttk.Label(self, text=message)
+        message_label.grid(row=0, column=1, padx=15, pady=15)
+
+        yes_button = ttk.Button(self, text="Yes", command=yes_func)
+        yes_button.grid(row=1, column=0, padx=15, pady=15)
+
+        no_button = ttk.Button(self, text="No", command=no_func)
+        no_button.grid(row=1, column=1, padx=15, pady=15)
+
+        self.wait_window(self)
+
+
 def custom_showerror(parent, title=None, message=None):
     CustomShowError(parent, title, message)
 
 
 def custom_showinfo(parent, title=None, message=None):
     CustomShowInfo(parent, title, message)
+
+
+def custom_askyesno(parent, title=None, message=None):
+    CustomAskyesno(parent, title, message)
