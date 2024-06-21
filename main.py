@@ -254,7 +254,7 @@ class GUI:
         analysis_type_label.grid(row=1, column=0, padx=PADX, pady=PADY)
 
         analysis_type_combobox = ttk.Combobox(left_frame4, values=[
-            "Sales Summary", "Daily Sales", "Weekly Sales", "Monthly Sales",
+            "Monthly Sales Summary", "Daily Sales", "Weekly Sales", "Monthly Sales",
             "Customer Segments", "Customer Segments Plot"])
         analysis_type_combobox.grid(row=1, column=1, padx=PADX, pady=PADY)
         analysis_type_combobox.current(0)
@@ -280,8 +280,8 @@ class GUI:
             sales_data = SalesData()
 
             try:
-                if analysis_type == "Sales Summary":
-                    summary = sales_data.get_sales_summary(period=analysis_type_combobox.get())
+                if analysis_type == "Monthly Sales Summary":
+                    summary = sales_data.get_sales_summary(period="Monthly Sales")
                     text_widget = tk.Text(frame, wrap='word')
                     text_widget.pack(expand=True, fill='both')
                     text_widget.insert(tk.END, summary)
