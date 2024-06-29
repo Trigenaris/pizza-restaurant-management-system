@@ -1,5 +1,5 @@
 <!-- Main Headline Here... -->
-<h1 align='center'> 🍕 Pizza Restaurant Management System (In Progress) </h1>
+<h1 align='center'> 🍕 Pizza Restaurant Management System </h1>
 
 <div align="center">
     <img src="https://github.com/Trigenaris/pizza-restaurant-management-system/blob/main/crazy_logo.png">
