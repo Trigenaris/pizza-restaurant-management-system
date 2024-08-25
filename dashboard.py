@@ -86,6 +86,8 @@ class SalesData:
         ax.set_title(f'{period} Trend')
         ax.set_xlabel('Order Date')
         ax.set_ylabel('Total Sales')
+        plt.xticks(rotation=30)
+        plt.tight_layout()
         return fig
 
     @handle_errors
@@ -108,5 +110,6 @@ class SalesData:
         ax.set_title('Customer Segments')
         ax.set_xlabel('Table Number')
         ax.set_ylabel('Total Spent')
+        plt.tight_layout()
         return fig
 
